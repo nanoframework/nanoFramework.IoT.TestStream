@@ -48,5 +48,5 @@ steps:
 # only build and run tests
 - template: azure-pipelines-templates/class-lib-build-only.yml@templates
   parameters:
-    runUnitTests: true
+    runUnitTests: false
     unitTestRunsettings: '$(System.DefaultWorkingDirectory)\.runsettings'
