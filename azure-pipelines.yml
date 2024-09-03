@@ -33,7 +33,10 @@ resources:
       endpoint: nanoframework
 
 pool:
-  vmImage: 'windows-latest'
+  # default is the following VM Image
+  # vmImage: 'windows-latest'
+  # playing with TestStream pool
+  name: TestStream
 
 variables:
   DOTNET_NOLOGO: true
