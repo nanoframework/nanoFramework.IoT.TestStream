@@ -34,9 +34,9 @@ resources:
 
 pool:
   # default is the following VM Image
-  # vmImage: 'windows-latest'
+  vmImage: 'windows-latest'
   # playing with TestStream pool
-  name: TestStream
+  #name: TestStream
 
 variables:
   DOTNET_NOLOGO: true
@@ -53,4 +53,4 @@ steps:
   parameters:
     runUnitTests: false
     unitTestRunsettings: '$(System.DefaultWorkingDirectory)\.runsettings'
-    sonarCloudProject: 'nanoframework_lib-nanoFramework.IoT.TestStream'
+    #sonarCloudProject: 'nanoframework_lib-nanoFramework.IoT.TestStream'
