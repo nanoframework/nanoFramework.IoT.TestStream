@@ -94,3 +94,4 @@ stages:
         custom: vstest
         arguments: '--logger:trx;logfilename=TEST.xml'
       timeoutInMinutes: 120
+
