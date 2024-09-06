@@ -33,7 +33,10 @@ resources:
       endpoint: nanoframework
 
 pool:
+  # default is the following VM Image
   vmImage: 'windows-latest'
+  # playing with TestStream pool
+  #name: TestStream
 
 variables:
   DOTNET_NOLOGO: true
@@ -45,15 +48,10 @@ variables:
 steps:
 
 # step from template @ nf-tools repo
-# all build, update and publish steps
-- template: azure-pipelines-templates/class-lib-build.yml@templates
+# only build and run tests
+- template: azure-pipelines-templates/class-lib-build-only.yml@templates
   parameters:
-    sonarCloudProject: 'nanoframework_lib-nanoFramework.IoT.TestStream'
-
-# step from template @ nf-tools repo
-# report error
-- template: azure-pipelines-templates/discord-webhook-task.yml@templates  
-  parameters:
-    status: 'failure'
-    webhookUrl: '$(DiscordWebhook)'
-    message: ''
+    runUnitTests: false
+    unitTestRunsettings: '$(System.DefaultWorkingDirectory)\.runsettings'
+    #sonarCloudProject: 'nanoframework_lib-nanoFramework.IoT.TestStream'
+    skipSonarCloudAnalysis: true
