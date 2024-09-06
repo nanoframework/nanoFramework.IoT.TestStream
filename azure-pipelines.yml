@@ -65,7 +65,7 @@ stages:
     - task: PublishPipelineArtifact@1
       displayName: Publish Pipeline Artifact copy
       inputs:
-        path: '$(System.DefaultWorkingDirectory)\nanoFramework.IoT.TestStream'
+        path: '$(System.DefaultWorkingDirectory)/**/bin'
         artifactName: 'Artifacts'
 
 - stage: Test
@@ -84,9 +84,9 @@ stages:
     - task: DownloadPipelineArtifact@2
       displayName: 'Download Pipeline Artifact'
       inputs:
-        path: '$(System.DefaultWorkingDirectory)\nanoFramework.IoT.TestStream'
+        path: '$(System.DefaultWorkingDirectory)'
 
-    - script: dotnet vstest **/*Test*.dll --logger:trx;logfilename=TEST.xml
+    - script: dotnet vstest $(System.DefaultWorkingDirectory)/**/NFUnitTest.dll --logger:trx;logfilename=TEST.xml
       displayName: 'Run tests'
       timeoutInMinutes: 120
 
