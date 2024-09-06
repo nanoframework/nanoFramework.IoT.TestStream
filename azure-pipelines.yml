@@ -62,6 +62,12 @@ stages:
         #sonarCloudProject: 'nanoframework_lib-nanoFramework.IoT.TestStream'
         skipSonarCloudAnalysis: true
 
+    - task: PublishPipelineArtifact@1
+      displayName: Publish Pipeline Artifact copy
+      inputs:
+        path: '$(System.DefaultWorkingDirectory)\nanoFramework.IoT.TestStream'
+        artifactName: 'Artifacts'
+
 - stage: Test
   displayName: 'Test'
   jobs:
@@ -75,7 +81,16 @@ stages:
     - script: echo 'Testing'
       displayName: 'Testing'
 
-    - task: VisualStudioTestPlatformInstaller@1
-      displayName: 'Visual Studio Test Platform Installer'
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download Pipeline Artifact'
       inputs:
-        versionSelector: latestStable
+        path: '$(System.DefaultWorkingDirectory)\nanoFramework.IoT.TestStream'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet custom'
+      inputs:
+        command: custom
+        projects: '**/*Test*.dll'
+        custom: vstest
+        arguments: '--logger:trx;logfilename=TEST.xml'
+      timeoutInMinutes: 120
