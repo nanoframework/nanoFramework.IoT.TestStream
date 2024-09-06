@@ -32,26 +32,45 @@ resources:
       name: nanoframework/nf-tools
       endpoint: nanoframework
 
-pool:
-  # default is the following VM Image
-  vmImage: 'windows-latest'
-  # playing with TestStream pool
-  #name: TestStream
+stages:
+- stage: Build
+  displayName: 'Build'
+  jobs:
+  - job: Build
+    displayName: 'Build job'
+    pool:
+      # default is the following VM Image
+      vmImage: 'windows-latest'
+      # playing with TestStream pool
+      #name: TestStream
 
-variables:
-  DOTNET_NOLOGO: true
-  solution: 'nanoFramework.IoT.TestStream.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  nugetPackageName: 'nanoFramework.IoT.TestStream'
+    variables:
+      DOTNET_NOLOGO: true
+      solution: 'nanoFramework.IoT.TestStream.sln'
+      buildPlatform: 'Any CPU'
+      buildConfiguration: 'Release'
+      nugetPackageName: 'nanoFramework.IoT.TestStream'
 
-steps:
+    steps:
 
-# step from template @ nf-tools repo
-# only build and run tests
-- template: azure-pipelines-templates/class-lib-build-only.yml@templates
-  parameters:
-    runUnitTests: false
-    unitTestRunsettings: '$(System.DefaultWorkingDirectory)\.runsettings'
-    #sonarCloudProject: 'nanoframework_lib-nanoFramework.IoT.TestStream'
-    skipSonarCloudAnalysis: true
+    # step from template @ nf-tools repo
+    # only build and run tests
+    - template: azure-pipelines-templates/class-lib-build-only.yml@templates
+      parameters:
+        runUnitTests: false
+        unitTestRunsettings: '$(System.DefaultWorkingDirectory)\.runsettings'
+        #sonarCloudProject: 'nanoframework_lib-nanoFramework.IoT.TestStream'
+        skipSonarCloudAnalysis: true
+
+- stage: Test
+  displayName: 'Test'
+  jobs:
+  - job: Test
+    displayName: 'Test job'
+    pool:
+      name: TestStream
+
+    steps:
+
+    - script: echo 'Testing'
+      displayName: 'Testing'
