@@ -89,3 +89,4 @@ stages:
     - script: dotnet vstest **/*Test*.dll --logger:trx;logfilename=TEST.xml
       displayName: 'Run tests'
       timeoutInMinutes: 120
+
