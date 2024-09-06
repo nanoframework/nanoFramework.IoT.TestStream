@@ -54,3 +54,4 @@ steps:
     runUnitTests: false
     unitTestRunsettings: '$(System.DefaultWorkingDirectory)\.runsettings'
     #sonarCloudProject: 'nanoframework_lib-nanoFramework.IoT.TestStream'
+    skipSonarCloudAnalysis: true
