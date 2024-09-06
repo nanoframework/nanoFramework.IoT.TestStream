@@ -74,3 +74,8 @@ stages:
 
     - script: echo 'Testing'
       displayName: 'Testing'
+
+    - task: VisualStudioTestPlatformInstaller@1
+      displayName: 'Visual Studio Test Platform Installer'
+      inputs:
+        versionSelector: latestStable
