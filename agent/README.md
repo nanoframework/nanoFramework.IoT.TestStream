@@ -130,3 +130,4 @@ Couple of good resources to read:
 * [Hardware access in a dev container in a secured way](https://stackoverflow.com/questions/24225647/docker-a-way-to-give-access-to-a-host-usb-or-serial-device). Jump to the summary at the end.
 * [USBIPD](https://github.com/dorssel/usbipd-win/tree/v4.3.0).
 * [Adding Agent Capabilities](https://stackoverflow.com/questions/54700536/automate-adding-capabilities-to-azure-devops-self-hosted-agents) and also [this one in PowerShell](https://blogs.blackmarble.co.uk/rfennell/programmatically-adding-user-capabilities-to-azure-devops-agents/).
+* [ADO REST API](https://learn.microsoft.com/en-us/rest/api/azure/devops/?view=azure-devops-rest-7.2).
