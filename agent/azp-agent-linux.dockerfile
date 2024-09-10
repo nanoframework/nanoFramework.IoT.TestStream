@@ -36,14 +36,13 @@ RUN apt-get install -y unzip
 RUN mkdir /usr/bin/microsoft.testplatform
 RUN unzip microsoft.testplatform.zip -d /usr/bin/microsoft.testplatform
 
-#RUN dotnet tool install -g nanoff
-RUN wget https://api.nuget.org/v3-flatcontainer/nanoff/2.5.90/nanoff.2.5.90.nupkg -O nanoff.2.5.90.nupkg
-RUN dotnet tool install -g --add-source ./nanoff.2.5.90.nupkg nanoff
-ENV PATH="${PATH}:/root/.dotnet/tools"
-
 ###################################
 # ADO Agent download and user setup
 WORKDIR /azp/
+
+RUN mkdir /azp/tools
+RUN dotnet tool install nanoff --tool-path /azp/tools
+ENV PATH="${PATH}:/azp/tools"
 
 COPY ./start.sh ./
 RUN chmod +x ./start.sh
