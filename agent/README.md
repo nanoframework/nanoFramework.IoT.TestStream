@@ -131,3 +131,4 @@ Couple of good resources to read:
 * [USBIPD](https://github.com/dorssel/usbipd-win/tree/v4.3.0).
 * [Adding Agent Capabilities](https://stackoverflow.com/questions/54700536/automate-adding-capabilities-to-azure-devops-self-hosted-agents) and also [this one in PowerShell](https://blogs.blackmarble.co.uk/rfennell/programmatically-adding-user-capabilities-to-azure-devops-agents/).
 * [ADO REST API](https://learn.microsoft.com/en-us/rest/api/azure/devops/?view=azure-devops-rest-7.2).
+* [ADO agent source code](https://github.com/microsoft/azure-pipelines-agent).
