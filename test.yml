@@ -7,6 +7,12 @@ stages:
   - stage: stage2_${{ replace(parameters.appComponents, '-', '_') }}
     dependsOn: Build
     displayName: Test for ${{ parameters.appComponents }}
+
+    pool:
+      name: TestStream
+      demands: 
+        - {{ parameters.appComponents }}
+
     jobs:
       - job:
         steps:
