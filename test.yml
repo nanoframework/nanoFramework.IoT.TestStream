@@ -3,14 +3,13 @@ parameters:
     displayName: "Component name"
     type: object
 
-steps:
-  - step: stage2_${{ replace(parameters.appComponents, '-', '_') }}
-    dependsOn: Build
-    displayName: Test for ${{ parameters.appComponents }}
-    jobs:
-      - job:
-        steps:
-        - bash: |
-            # Write your commands here            
-            echo "Hello world"
-            echo "i am here"
+step: stage2_${{ replace(parameters.appComponents, '-', '_') }}
+dependsOn: Build
+displayName: Test for ${{ parameters.appComponents }}
+jobs:
+  - job:
+    steps:
+    - bash: |
+        # Write your commands here            
+        echo "Hello world"
+        echo "i am here"
