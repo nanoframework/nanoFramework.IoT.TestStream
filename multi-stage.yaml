@@ -79,9 +79,6 @@ stages:
         path: '$(System.DefaultWorkingDirectory)'
         artifactName: 'Artifacts'
 
-- stage: Test
-  displayName: 'Test'
-
 - ${{ each appComponents in parameters.appComponents }}:   
   - template: test.yml
     parameters:
