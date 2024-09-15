@@ -81,15 +81,8 @@ stages:
 
 - stage: Test
   displayName: 'Test'
-  jobs:
-  - job: Test
-    displayName: 'Test job'
-    pool:
-      name: TestStream
 
-    steps:
-
-    - ${{ each appComponents in parameters.appComponents }}:   
-      - template: test.yml
-        parameters:
-          appComponents: ${{ appComponents }}
+- ${{ each appComponents in parameters.appComponents }}:   
+  - template: test.yml
+    parameters:
+      appComponents: ${{ appComponents }}
