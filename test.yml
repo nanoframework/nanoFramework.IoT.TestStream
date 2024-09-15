@@ -3,8 +3,8 @@ parameters:
     displayName: "Component name"
     type: object
 
-stages:
-  - stage: stage2_${{ replace(parameters.appComponents, '-', '_') }}
+steps:
+  - step: stage2_${{ replace(parameters.appComponents, '-', '_') }}
     dependsOn: Build
     displayName: Test for ${{ parameters.appComponents }}
     jobs:
