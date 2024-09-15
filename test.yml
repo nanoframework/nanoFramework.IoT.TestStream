@@ -11,7 +11,7 @@ stages:
     pool:
       name: TestStream
       demands: 
-        - {{ parameters.appComponents }}
+        - ${{ parameters.appComponents }}
 
     jobs:
       - job:
