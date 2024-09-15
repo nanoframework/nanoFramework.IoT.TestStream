@@ -34,11 +34,7 @@ resources:
 
 variables:
 - name: appComponents
-  displayName: YAML list of Components to Build and Deploy
-  type: object
-  default:
-    - ESP32
-    - STEM32
+  value: [ 'ESP32', 'STM32' ]
 
 stages:
 - stage: Build
