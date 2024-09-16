@@ -32,16 +32,13 @@ resources:
       name: nanoframework/nf-tools
       endpoint: nanoframework
 
-#parameters:
-#- name: appComponents
-#  displayName: YAML list of Components to Build and Deploy
-#  type: object
-#  default:
-#    - ESP32
-#    - STM32
-variables:
+parameters:
 - name: appComponents
-  value: "ESP32,STM32"
+  displayName: List of capabilities to run the tests on
+  type: object
+  default:
+    - ESP32
+    - STM32
 
 stages:
 - stage: Build
@@ -78,10 +75,8 @@ stages:
       inputs:
         path: '$(System.DefaultWorkingDirectory)'
         artifactName: 'Artifacts'
-    
-    - bash: echo "##vso[task.setvariable variable=appComponents]ESP32"
 
-- ${{ each appComponents in split(variables.appComponents, ',') }}:   
+- ${{ each appComponents in parameters.appComponents }}:   
   - template: test.yml
     parameters:
       appComponents: ${{ appComponents }}
