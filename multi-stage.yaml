@@ -32,13 +32,16 @@ resources:
       name: nanoframework/nf-tools
       endpoint: nanoframework
 
-parameters:
+#parameters:
+#- name: appComponents
+#  displayName: YAML list of Components to Build and Deploy
+#  type: object
+#  default:
+#    - ESP32
+#    - STM32
+variables:
 - name: appComponents
-  displayName: YAML list of Components to Build and Deploy
-  type: object
-  default:
-    - ESP32
-    - STM32
+  value: "ESP32,STM32"
 
 stages:
 - stage: Build
@@ -76,7 +79,7 @@ stages:
         path: '$(System.DefaultWorkingDirectory)'
         artifactName: 'Artifacts'
 
-- ${{ each appComponents in parameters.appComponents }}:   
+- ${{ each appComponents in split(variables.appComponents, ',') }}:   
   - template: test.yml
     parameters:
       appComponents: ${{ appComponents }}

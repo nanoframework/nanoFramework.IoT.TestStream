@@ -4,7 +4,7 @@ parameters:
     type: object
 
 stages:
-  - stage: stage2_${{ replace(parameters.appComponents, '-', '_') }}
+  - stage: Test_${{ replace(parameters.appComponents, '-', '_') }}
     dependsOn: Build
     displayName: Test for ${{ parameters.appComponents }}
 
