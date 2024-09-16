@@ -1,0 +1,22 @@
+parameters:
+  - name: appComponents
+    displayName: "Component name"
+    type: object
+
+stages:
+  - stage: Test_${{ replace(parameters.appComponents, '-', '_') }}
+    dependsOn: Build
+    displayName: Test for ${{ parameters.appComponents }}
+
+    pool:
+      name: TestStream
+      demands: 
+        - ${{ parameters.appComponents }}
+
+    jobs:
+      - job:
+        steps:
+        - bash: |
+            # Write your commands here            
+            echo "Hello world"
+            echo "i am here"
