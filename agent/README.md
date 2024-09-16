@@ -121,6 +121,8 @@ This prototype is how it could look like:
 
 In a bash script, it's easy to use [jq](https://jqlang.github.io/jq/) to parse json and it's already installed as the start agent script use it.
 
+See how to set up user capabilities in [this page](capacity.md).
+
 TODO: create a proper config file.
 
 ## Resources

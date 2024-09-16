@@ -1,0 +1,27 @@
+GET https://dev.azure.com/nanoframework/_apis/distributedtask/pools?poolName=TestStream&api-version=7.2-preview.1
+Authorization: Basic OnE1dWxweGt1NmVlc3NxeWhtYnB0ZnR4eHh2ZWU1enZpZnVmbnY0N2Vjd25nMzNvZDU0eHE=
+Accept:application/json;
+
+###
+
+GET https://dev.azure.com/nanoframework/_apis/distributedtask/pools/11/agents?api-version=7.2-preview.1
+Authorization: Basic OnE1dWxweGt1NmVlc3NxeWhtYnB0ZnR4eHh2ZWU1enZpZnVmbnY0N2Vjd25nMzNvZDU0eHE=
+Accept:application/json;
+
+###
+
+PUT https://dev.azure.com/nanoframework/_apis/distributedtask/pools/11/agents/99/usercapabilities?api-version=7.2-preview.1
+Authorization: Basic OnE1dWxweGt1NmVlc3NxeWhtYnB0ZnR4eHh2ZWU1enZpZnVmbnY0N2Vjd25nMzNvZDU0eHE=
+Content-Type: application/json
+Accept: application/json
+
+{
+    "ESP32": "ESP32",
+    "ESP32-C3": "ESP32-C3"
+}
+
+###
+
+GET https://dev.azure.com/nanoframework/_apis/distributedtask/packages/agent?platform=linux-x64&top=1
+Authorization: Basic OnE1dWxweGt1NmVlc3NxeWhtYnB0ZnR4eHh2ZWU1enZpZnVmbnY0N2Vjd25nMzNvZDU0eHE=
+Content-Type: application/json
