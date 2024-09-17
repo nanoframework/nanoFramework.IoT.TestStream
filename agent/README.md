@@ -51,6 +51,14 @@ TODO: have it available in GitHub container registry like for the nf-interpreter
 
 Hardware access can be challenging in a dev container. For this, the user under which the container is running (root in a case of docker or the current user in the case of podman) should have access to the hardware. It's mainly about adding the user to the group.
 
+Create a file named /etc/udev/rules.d/99-serial.rules. Add the following line to that file:
+
+```shell
+KERNEL=="ttyACM[0-9]*",MODE="0666"
+```
+
+You will need then to exit WSL and restart WSL byt running the command `wsl --shutdown` and then again `wsl` to reenter it.
+
 Then, in the container, a volume pointing out on the hardware needs to to be set **and** the device cgroup rule needs to be adjusted.
 
 As an example, the serial port from the previous example is mapped on `/dev/ttyACM0`. Running the following command will show in which group the port is and the type of access:
