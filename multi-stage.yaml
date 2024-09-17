@@ -32,6 +32,14 @@ resources:
       name: nanoframework/nf-tools
       endpoint: nanoframework
 
+parameters:
+- name: appComponents
+  displayName: List of capabilities to run the tests on
+  type: object
+  default:
+    - ESP32
+    - STM32
+
 stages:
 - stage: Build
   displayName: 'Build'
@@ -68,24 +76,7 @@ stages:
         path: '$(System.DefaultWorkingDirectory)'
         artifactName: 'Artifacts'
 
-- stage: Test
-  displayName: 'Test'
-  jobs:
-  - job: Test
-    displayName: 'Test job'
-    pool:
-      name: TestStream
-
-    steps:
-
-    - script: echo 'Testing'
-      displayName: 'Testing'
-
-    - task: DownloadPipelineArtifact@2
-      displayName: 'Download Pipeline Artifact'
-      inputs:
-        path: '$(System.DefaultWorkingDirectory)'
-
-    - script: dotnet vstest $(System.DefaultWorkingDirectory)/**/NFUnitTest.dll --logger:trx;logfilename=TEST.xml
-      displayName: 'Run tests'
-      timeoutInMinutes: 120
+- ${{ each appComponents in parameters.appComponents }}:   
+  - template: test.yml
+    parameters:
+      appComponents: ${{ appComponents }}
