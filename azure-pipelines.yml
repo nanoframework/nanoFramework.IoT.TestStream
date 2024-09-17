@@ -93,4 +93,4 @@ stages:
     - task: PublishTestResults@2
       inputs:
         testResultsFormat: 'VSTest' # 'JUnit' | 'NUnit' | 'VSTest' | 'XUnit' | 'CTest'. Alias: testRunner. Required. Test result format. Default: JUnit.
-        testResultsFiles: '**/TEST-*.xml
+        testResultsFiles: '**/TEST-*.xml'
