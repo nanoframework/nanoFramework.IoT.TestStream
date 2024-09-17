@@ -86,6 +86,6 @@ stages:
       inputs:
         path: '$(System.DefaultWorkingDirectory)'
 
-    - script: dotnet vstest $(System.DefaultWorkingDirectory)/**/NFUnitTest.dll --logger:trx;logfilename=TEST.xml
+    - script: mono vstest $(System.DefaultWorkingDirectory)/**/NFUnitTest.dll --logger:trx;logfilename=TEST.xml
       displayName: 'Run tests'
       timeoutInMinutes: 120
