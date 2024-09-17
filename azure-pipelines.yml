@@ -89,3 +89,8 @@ stages:
     - script:  mono /azp/TestPlatform/vstest.console.exe /azp/_work/1/s/Artifacts/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:/azp/_work/1/s/Artifacts/UnitTestStream/nano.runsettings /TestAdapterPath:/azp/_work/1/s/Artifacts/packages/nanoFramework.TestFramework.2.1.111/ /Logger:trx;logfilename=TEST.xml
       displayName: 'Run tests'
       timeoutInMinutes: 120
+    
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'VSTest' # 'JUnit' | 'NUnit' | 'VSTest' | 'XUnit' | 'CTest'. Alias: testRunner. Required. Test result format. Default: JUnit.
+        testResultsFiles: '**/TEST-*.xml
