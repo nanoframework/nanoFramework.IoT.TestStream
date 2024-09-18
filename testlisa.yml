@@ -23,10 +23,11 @@ stages:
               else
                 echo "Agent with capability ${{ parameters.appComponents }} found."
                 echo "##vso[task.setvariable variable=skipTest;isOutput=true]false"        
+              fi
 
       - job: RunTest
         dependsOn: CheckAgentCapability
-        condition: and(succeeded(), eq(dependencies.CheckCapabilities.outputs['CheckCapabilities.skipTest'], 'false'))
+        condition: and(succeeded(), eq(dependencies.CheckAgentCapability.outputs['CheckAgentCapability.skipTest'], 'false'))
         displayName: "Run test for ${{ parameters.appComponents }}"
         pool:
           name: LisaTestAgentPools
