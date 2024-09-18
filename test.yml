@@ -26,7 +26,7 @@ stages:
         - bash: |
             # flash the device with nanoff
             SerialPort=$(cat /azp/config/configuration.json | jq -r '.capabilities.${{ parameters.appComponents }}')
-            nanoff --target ${{ parameters.appComponents }} --update --masserase --serialport $(echo SerialPort) --baud 1000000
+            nanoff --target ${{ parameters.appComponents }} --update --masserase --serialport $(echo $SerialPort) --baud 1000000
             exit $?
           displayName: 'Flash device'
           retryCountOnTaskFailure: 10
