@@ -75,6 +75,8 @@ stages:
     displayName: 'Test job'
     pool:
       name: LisaTestAgentPools
+      demands: 
+        - ESP32
 
     steps:
 
