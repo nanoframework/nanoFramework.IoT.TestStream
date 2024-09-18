@@ -79,10 +79,12 @@ To export multiple ports, just add more rules and more volume mount.
 This is how to run the agent container previously built passing the needed elements.
 
 ```shell
-docker run -e AZP_URL="https://dev.azure.com/nanoframework" -e AZP_TOKEN="supersecrettoken" -e AZP_POOL="TestStream" -e AZP_AGENT_NAME="Docker Agent - Linux" --device-cgroup-rule='c 166:* rmw' -v /dev/ttyACM0:/dev/ttyACM0 azp-agent:linux
+docker run -e AZP_URL="https://dev.azure.com/nanoframework" -e AZP_TOKEN="supersecrettoken" -e AZP_POOL="TestStream" -e AZP_AGENT_NAME="Docker Agent - Linux" --device-cgroup-rule='c 166:* rmw' -v /dev/ttyACM0:/dev/ttyACM0 -v ./config:/azp/config azp-agent:linux
 ```
 
 Note that if for debug reasons you want to access the container, you can add `-it --entrypoint /bin/bash` right after the `run`.
+
+See the [configuration](#configuration-file) section for mounting the config folder.
 
 TODO: add this in a script or equivalent, mount the drivers and the groups automatically based on a json config file.
 
@@ -129,7 +131,7 @@ This prototype is how it could look like:
 
 In a bash script, it's easy to use [jq](https://jqlang.github.io/jq/) to parse json and it's already installed as the start agent script use it.
 
-TODO: create a proper config file.
+In order to mount properly the configuration file, you need to add `-v ./config:/azp/config` to the docker run command. This assumes you are running docker from the parent folder of the configuration file.
 
 ## Resources
 
