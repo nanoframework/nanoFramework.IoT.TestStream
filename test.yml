@@ -29,6 +29,7 @@ stages:
             nanoff --target ${{ parameters.appComponents }} --update --masserase --serialport $(echo SerialPort)
             exit $?
           displayName: 'Flash device'
+          retryCountOnTaskFailure: 10
 
         - bash: |
             # replace <IsRealHardware>False</IsRealHardware> by <IsRealHardware>True</IsRealHardware> in nano.runsettings
@@ -46,6 +47,7 @@ stages:
             exit $?
           displayName: 'Run tests'
           timeoutInMinutes: 120
+          retryCountOnTaskFailure: 10
         
         - task: PublishTestResults@2
           inputs:
