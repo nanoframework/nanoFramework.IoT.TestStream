@@ -8,6 +8,11 @@
           "port":"/dev/ttyACM1",
           "cgroup":166 }
     ],
+    "capabilities":
+    {
+      "XIAO_ESP32C3":"/dev/ttyACM0",
+      "ESP32_C3_REV3":"/dev/ttyUSB0"
+    },
     "config": {
         "token":"supersecrettoken",
         "org":"nanoframework",
