@@ -56,6 +56,8 @@ stages:
                 echo "$RESULT_TEST"
                 if [[ "$RESULT_TEST" == *"Couldn't connect to the device"* ]]; then
                     echo "Test failed. Retrying in $DELAY seconds..."
+                    # we need to delete the trx file to avoid confusion
+                    find $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/TestResults -type f -name "*.trx" -exec rm -f {} \;
                     ((attempt++))
                     sleep $DELAY
                 else
