@@ -51,6 +51,14 @@ TODO: have it available in GitHub container registry like for the nf-interpreter
 
 Hardware access can be challenging in a dev container. For this, the user under which the container is running (root in a case of docker or the current user in the case of podman) should have access to the hardware. It's mainly about adding the user to the group.
 
+Create a file named /etc/udev/rules.d/99-serial.rules. Add the following line to that file:
+
+```shell
+KERNEL=="ttyACM[0-9]*",MODE="0666"
+```
+
+You will need then to exit WSL and restart WSL byt running the command `wsl --shutdown` and then again `wsl` to reenter it.
+
 Then, in the container, a volume pointing out on the hardware needs to to be set **and** the device cgroup rule needs to be adjusted.
 
 As an example, the serial port from the previous example is mapped on `/dev/ttyACM0`. Running the following command will show in which group the port is and the type of access:
@@ -71,10 +79,12 @@ To export multiple ports, just add more rules and more volume mount.
 This is how to run the agent container previously built passing the needed elements.
 
 ```shell
-docker run -e AZP_URL="https://dev.azure.com/nanoframework" -e AZP_TOKEN="supersecrettoken" -e AZP_POOL="TestStream" -e AZP_AGENT_NAME="Docker Agent - Linux" --device-cgroup-rule='c 166:* rmw' -v /dev/ttyACM0:/dev/ttyACM0 azp-agent:linux
+docker run -e AZP_URL="https://dev.azure.com/nanoframework" -e AZP_TOKEN="supersecrettoken" -e AZP_POOL="TestStream" -e AZP_AGENT_NAME="Docker Agent - Linux" --device-cgroup-rule='c 166:* rmw' -v /dev/ttyACM0:/dev/ttyACM0 -v ./config:/azp/config azp-agent:linux
 ```
 
 Note that if for debug reasons you want to access the container, you can add `-it --entrypoint /bin/bash` right after the `run`.
+
+See the [configuration](#configuration-file) section for mounting the config folder.
 
 TODO: add this in a script or equivalent, mount the drivers and the groups automatically based on a json config file.
 
@@ -121,7 +131,7 @@ This prototype is how it could look like:
 
 In a bash script, it's easy to use [jq](https://jqlang.github.io/jq/) to parse json and it's already installed as the start agent script use it.
 
-TODO: create a proper config file.
+In order to mount properly the configuration file, you need to add `-v ./config:/azp/config` to the docker run command. This assumes you are running docker from the parent folder of the configuration file.
 
 ## Resources
 

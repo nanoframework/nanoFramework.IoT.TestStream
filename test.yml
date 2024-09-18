@@ -16,7 +16,40 @@ stages:
     jobs:
       - job:
         steps:
+        - script: echo 'Testing'
+          displayName: 'Testing'
+
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download Pipeline Artifact'
+          inputs:
+            path: '$(System.DefaultWorkingDirectory)'
+
         - bash: |
-            # Write your commands here            
-            echo "Hello world"
-            echo "i am here"
+            # replace <IsRealHardware>False</IsRealHardware> by <IsRealHardware>True</IsRealHardware> in nano.runsettings
+            sed -i "s/<IsRealHardware>False<\/IsRealHardware>/<IsRealHardware>True<\/IsRealHardware>/g" $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings
+            sed -i "s/<ResultsDirectory>.*<\/ResultsDirectory>/<ResultsDirectory>\.\/TestResults<\/ResultsDirectory>/g" $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings
+            # replace the serial port by the one in the configuration for parameters.appComponents
+            SerialPort=$(cat /azp/config/configuration.json | jq -r '.capabilities.${{ parameters.appComponents }}')
+            sed -i "s|<RealHardwarePort>.*<\/RealHardwarePort>|<RealHardwarePort>$(echo $SerialPort)<\/RealHardwarePort>|g" $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings
+            cat $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings
+          displayName: 'Update nano.runsettings'
+
+        - script:  mono /azp/TestPlatform/vstest.console.exe $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:$(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings /TestAdapterPath:$(System.DefaultWorkingDirectory)/Artifacts/packages/nanoFramework.TestFramework.2.1.111/ /Logger:trx;LogFileName=TEST.xml
+          displayName: 'Run tests'
+          timeoutInMinutes: 120
+        
+        - task: PublishTestResults@2
+          inputs:
+            testResultsFormat: 'VSTest' # 'JUnit' | 'NUnit' | 'VSTest' | 'XUnit' | 'CTest'. Alias: testRunner. Required. Test result format. Default: JUnit.
+            testResultsFiles: '**/*.trx'
+
+        - bash: |
+            # Define the subdirectory path
+            SUBDIRECTORY_PATH="$(System.DefaultWorkingDirectory)"
+
+            # Find and remove all .trx files in the subdirectory
+            find "$SUBDIRECTORY_PATH" -type f -name "*.trx" -exec rm -f {} \;
+
+            # Optional: Print a message indicating completion
+            echo "All .trx files have been removed from $SUBDIRECTORY_PATH"
+          displayName: Cleaning tests results
