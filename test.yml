@@ -26,10 +26,32 @@ stages:
         - bash: |
             # flash the device with nanoff
             SerialPort=$(cat /azp/config/configuration.json | jq -r '.capabilities.${{ parameters.appComponents }}')
-            nanoff --target ${{ parameters.appComponents }} --update --masserase --serialport $(echo $SerialPort) --baud 1000000
-            exit $?
+
+            # Maximum number of retries
+            MAX_RETRIES=10
+            # Delay between retries in seconds
+            DELAY=2
+            # Initialize the counter
+            attempt=0
+
+            # Loop to retry the function call
+            while (( attempt < MAX_RETRIES )); do
+              nanoff --target ${{ parameters.appComponents }} --update --masserase --serialport $(echo $SerialPort) --baud 1000000
+              status=$?
+              if [ $status -eq 0 ]; then
+                  break
+              else
+                  ((attempt++))
+                  sleep $DELAY
+              fi
+            done
+            
+            if [ $attempt -eq $MAX_RETRIES ]; then
+                echo "Flashing failed after $MAX_RETRIES attempts."
+                exit 1
+            fi
           displayName: 'Flash device'
-          retryCountOnTaskFailure: 10
+          retryCountOnTaskFailure: 3
 
         - bash: |
             # replace <IsRealHardware>False</IsRealHardware> by <IsRealHardware>True</IsRealHardware> in nano.runsettings
@@ -44,7 +66,7 @@ stages:
 
         - bash: |
             # Maximum number of retries
-            MAX_RETRIES=5
+            MAX_RETRIES=10
             # Delay between retries in seconds
             DELAY=2
             # Initialize the counter
