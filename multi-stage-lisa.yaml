@@ -1,0 +1,82 @@
+# Copyright (c) .NET Foundation and Contributors
+# See LICENSE file in the project root for full license information.
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+      - release-*
+  paths:
+    exclude:
+      - .github_changelog_generator
+      - .gitignore
+      - CHANGELOG.md
+      - CODE_OF_CONDUCT.md
+      - LICENSE.md
+      - README.md
+      - NuGet.Config
+      - assets/*
+      - config/*
+      - .github/*
+
+# PR always trigger build
+pr:
+  autoCancel: true
+
+# add nf-tools repo to resources (for Azure Pipelines templates)
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: nanoframework/nf-tools
+      endpoint: nanoframework
+
+parameters:
+- name: appComponents
+  displayName: List of capabilities to run the tests on
+  type: object
+  default:
+    - ESP32
+    - STM32
+
+stages:
+- stage: Build
+  displayName: 'Build'
+  jobs:
+  - job: Build
+    displayName: 'Build job'
+    pool:
+      # default is the following VM Image
+      vmImage: 'windows-latest'
+      # playing with TestStream pool
+      #name: TestStream
+
+    variables:
+      DOTNET_NOLOGO: true
+      solution: 'nanoFramework.IoT.TestStream.sln'
+      buildPlatform: 'Any CPU'
+      buildConfiguration: 'Release'
+      nugetPackageName: 'nanoFramework.IoT.TestStream'
+
+    steps:
+
+    # step from template @ nf-tools repo
+    # only build and run tests
+    - template: azure-pipelines-templates/class-lib-build-only.yml@templates
+      parameters:
+        runUnitTests: false
+        unitTestRunsettings: '$(System.DefaultWorkingDirectory)\.runsettings'
+        #sonarCloudProject: 'nanoframework_lib-nanoFramework.IoT.TestStream'
+        skipSonarCloudAnalysis: true
+
+    - task: PublishPipelineArtifact@1
+      displayName: Publish Pipeline Artifact copy
+      inputs:
+        path: '$(System.DefaultWorkingDirectory)'
+        artifactName: 'Artifacts'
+
+- ${{ each appComponents in parameters.appComponents }}:   
+  - template: test.yml
+    parameters:
+      appComponents: ${{ appComponents }}
