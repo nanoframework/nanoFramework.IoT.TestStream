@@ -86,7 +86,7 @@ stages:
       inputs:
         path: '$(System.DefaultWorkingDirectory)'
 
-    - script:  mono /azp/TestPlatform/vstest.console.exe /azp/_work/1/s/Artifacts/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:/azp/_work/1/s/Artifacts/UnitTestStream/nano.runsettings /TestAdapterPath:/azp/_work/1/s/Artifacts/packages/nanoFramework.TestFramework.2.1.111/ /Logger:trx;LogFileName=TEST.xml
+    - script:  mono /azp/TestPlatform/vstest.console.exe $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:$(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings /TestAdapterPath:/azp/_work/1/$(System.DefaultWorkingDirectory)/Artifacts/packages/nanoFramework.TestFramework.2.1.111/ /Logger:trx;LogFileName=TEST.xml
       displayName: 'Run tests'
       timeoutInMinutes: 120
     
@@ -94,3 +94,14 @@ stages:
       inputs:
         testResultsFormat: 'VSTest' # 'JUnit' | 'NUnit' | 'VSTest' | 'XUnit' | 'CTest'. Alias: testRunner. Required. Test result format. Default: JUnit.
         testResultsFiles: '**/*.trx'
+
+    - bash: |
+        # Define the subdirectory path
+        SUBDIRECTORY_PATH="$(System.DefaultWorkingDirectory)"
+
+        # Find and remove all .trx files in the subdirectory
+        find "$SUBDIRECTORY_PATH" -type f -name "*.trx" -exec rm -f {} \;
+
+        # Optional: Print a message indicating completion
+        echo "All .trx files have been removed from $SUBDIRECTORY_PATH"
+      displayName: Cleaning tests results
