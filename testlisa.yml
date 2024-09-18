@@ -9,7 +9,7 @@ stages:
     displayName: Test for ${{ parameters.appComponents }}
 
     pool:
-      name: TestStream
+      name: LisaTestAgentPools
       demands: 
         - ${{ parameters.appComponents }}
 
