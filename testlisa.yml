@@ -1,16 +1,20 @@
 parameters:
   - name: appComponents
     displayName: "Component name"
-    type: object
+    type: string  # Change type to string to allow conditional checks
 
 stages:
   - stage: Test_${{ replace(parameters.appComponents, '-', '_') }}
     dependsOn: Build
     displayName: Test for ${{ parameters.appComponents }}
 
+    # Check if there is an agent with the required capability
+    condition: |
+      exists('Agent.Capabilities.${{ parameters.appComponents }}')
+
     pool:
       name: LisaTestAgentPools
-      demands: 
+      demands:
         - ${{ parameters.appComponents }}
 
     jobs:
