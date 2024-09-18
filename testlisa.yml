@@ -16,14 +16,13 @@ stages:
         steps:
           - script: |
               echo "Checking if agent with ${{ parameters.appComponents }} exists..."
-              # This command checks if the agent has the required capability
+              # Check if the agent has the required capability
               if [ -z "$(echo $(Agent.Capabilities.${{ parameters.appComponents }}))" ]; then
                 echo "No agent found with capability ${{ parameters.appComponents }}"
-                echo "##vso[task.setvariable variable=skipTest;isOutput=true]true"
+                echo "##vso[task.complete result=Canceled;]Capability ${{ parameters.appComponents }} not found, canceling job."
               else
                 echo "Agent with capability ${{ parameters.appComponents }} found."
-                echo "##vso[task.setvariable variable=skipTest;isOutput=true]false"
-              fi
+                echo "##vso[task.setvariable variable=skipTest;isOutput=true]false"        
 
       - job: RunTest
         dependsOn: CheckAgentCapability
