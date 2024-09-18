@@ -27,10 +27,12 @@ stages:
         - bash: |
             # replace <IsRealHardware>False</IsRealHardware> by <IsRealHardware>True</IsRealHardware> in nano.runsettings
             sed -i 's/<IsRealHardware>False<\/IsRealHardware>/<IsRealHardware>True<\/IsRealHardware>/g' $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings
-
+            sed -i 's/<ResultsDirectory>.*<\/ResultsDirectory>/<ResultsDirectory>./TestResults<\/ResultsDirectory>/g' $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings
             # replace the serial port by the one in the configuration for parameters.appComponents
             SerialPort=$(cat /azp/config/configuration.json | jq -r '.capabilities.XIAO_ESP32C3')
             sed -i 's/<RealHardwarePort>.*<\/RealHardwarePort>/<SerialPort>$(SerialPort)<\/SerialPort>/g' $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings
+            cat $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings
+          displayName: 'Update nano.runsettings'
 
         - script:  mono /azp/TestPlatform/vstest.console.exe $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:$(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings /TestAdapterPath:/azp/_work/1/$(System.DefaultWorkingDirectory)/Artifacts/packages/nanoFramework.TestFramework.2.1.111/ /Logger:trx;LogFileName=TEST.xml
           displayName: 'Run tests'
