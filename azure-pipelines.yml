@@ -94,3 +94,13 @@ stages:
       inputs:
         testResultsFormat: 'VSTest' # 'JUnit' | 'NUnit' | 'VSTest' | 'XUnit' | 'CTest'. Alias: testRunner. Required. Test result format. Default: JUnit.
         testResultsFiles: '**/*.trx'
+
+    - bash: |
+        # Define the subdirectory path
+        SUBDIRECTORY_PATH="/azp/_work/1/s/Artifacts"
+
+        # Find and remove all .trx files in the subdirectory
+        find "$SUBDIRECTORY_PATH" -type f -name "*.trx" -exec rm -f {} \;
+
+        # Optional: Print a message indicating completion
+        echo "All .trx files have been removed from $SUBDIRECTORY_PATH"
