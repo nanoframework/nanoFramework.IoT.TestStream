@@ -85,6 +85,27 @@ print_header "3. Configuring Azure Pipelines agent..."
   --replace \
   --acceptTeeEula & wait $!
 
+# setting up the capabilities
+AZP_POOL_AGENTS=$(curl -LsS -u user:$(cat "${AZP_TOKEN_FILE}") \
+  -H "Accept:application/json;" \
+  "${AZP_URL}/_apis/distributedtask/pools?poolName=${AZP_POOL}&api-version=7.2-preview.1")
+AZP_POOL_ID=$(echo "${AZP_POOL_AGENTS}" | jq -r ".value[0].id")
+# URL encode the AZP_AGENT_NAME environment variable
+encoded_name=$(jq -rn --arg v "$AZP_AGENT_NAME" '$v|@uri')
+# Print the encoded name
+AZP_POOL_AGENTS=$(curl -LsS -u user:$(cat "${AZP_TOKEN_FILE}") \
+  -H "Accept:application/json;" \
+  "${AZP_URL}/_apis/distributedtask/pools/${AZP_POOL_ID}/agents?agentName=${encoded_name}&api-version=7.2-preview.1")
+AZP_AGENT_ID=$(echo "${AZP_POOL_AGENTS}" | jq -r ".value[0].id")
+
+# Sending the custom capabilities
+capabilities=$(cat /azp/config/configuration.json | jq -r ".capabilities")
+AZP_POOL_AGENTS=$(curl -LsS -X PUT -u user:$(cat "${AZP_TOKEN_FILE}") \
+  -H "Content-Type: application/json" \
+  -d "${capabilities}" \
+  "${AZP_URL}/_apis/distributedtask/pools/${AZP_POOL_ID}/agents/${AZP_AGENT_ID}/usercapabilities?api-version=7.2-preview.1")
+echo "Capabilities set: ${capabilities}"
+
 print_header "4. Running Azure Pipelines agent..."
 
 chmod +x ./run.sh

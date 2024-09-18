@@ -86,7 +86,7 @@ stages:
       inputs:
         path: '$(System.DefaultWorkingDirectory)'
 
-    - script:  mono /azp/TestPlatform/vstest.console.exe $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:$(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings /TestAdapterPath:/azp/_work/1/$(System.DefaultWorkingDirectory)/Artifacts/packages/nanoFramework.TestFramework.2.1.111/ /Logger:trx;LogFileName=TEST.xml
+    - script:  mono /azp/TestPlatform/vstest.console.exe $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:$(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings /TestAdapterPath:$(System.DefaultWorkingDirectory)/Artifacts/packages/nanoFramework.TestFramework.2.1.111/ /Logger:trx;LogFileName=TEST.xml
       displayName: 'Run tests'
       timeoutInMinutes: 120
     

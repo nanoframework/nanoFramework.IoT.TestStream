@@ -5,7 +5,7 @@ ENV TARGETARCH="linux-x64"
 # The core elements
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y curl git jq libicu70 
+RUN apt install -y curl git jq libicu70 nano
 
 ###################################################
 # Global Tools Installation
