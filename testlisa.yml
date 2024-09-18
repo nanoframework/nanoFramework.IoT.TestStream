@@ -24,7 +24,6 @@ stages:
                 echo "Agent with capability ${{ parameters.appComponents }} found."
                 echo "##vso[task.setvariable variable=skipTest;isOutput=true]false"
               fi
-        name: CheckCapabilities
 
       - job: RunTest
         dependsOn: CheckAgentCapability
