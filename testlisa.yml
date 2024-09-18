@@ -1,26 +1,40 @@
 parameters:
   - name: appComponents
     displayName: "Component name"
-    type: string  # Change type to string to allow conditional checks
+    type: string
 
 stages:
   - stage: Test_${{ replace(parameters.appComponents, '-', '_') }}
     dependsOn: Build
     displayName: Test for ${{ parameters.appComponents }}
 
-    # Check if there is an agent with the required capability
-    condition: |
-      exists('Agent.Capabilities.${{ parameters.appComponents }}')
-
-    pool:
-      name: LisaTestAgentPools
-      demands:
-        - ${{ parameters.appComponents }}
-
     jobs:
-      - job:
+      - job: CheckAgentCapability
+        displayName: "Check if agent with ${{ parameters.appComponents }} capability exists"
+        pool:
+          name: LisaTestAgentPools
         steps:
-        - bash: |
-            # Write your commands here            
-            echo "Hello world"
-            echo "i am here"
+          - script: |
+              echo "Checking if agent with ${{ parameters.appComponents }} exists..."
+              # This command checks if the agent has the required capability
+              if [ -z "$(echo $(Agent.Capabilities.${{ parameters.appComponents }}))" ]; then
+                echo "No agent found with capability ${{ parameters.appComponents }}"
+                echo "##vso[task.setvariable variable=skipTest;isOutput=true]true"
+              else
+                echo "Agent with capability ${{ parameters.appComponents }} found."
+                echo "##vso[task.setvariable variable=skipTest;isOutput=true]false"
+              fi
+        name: CheckCapabilities
+
+      - job: RunTest
+        dependsOn: CheckAgentCapability
+        condition: and(succeeded(), eq(dependencies.CheckCapabilities.outputs['CheckCapabilities.skipTest'], 'false'))
+        displayName: "Run test for ${{ parameters.appComponents }}"
+        pool:
+          name: LisaTestAgentPools
+          demands:
+            - ${{ parameters.appComponents }}
+        steps:
+          - bash: |
+              echo "Running test for ${{ parameters.appComponents }}"
+              # Add your test script here
