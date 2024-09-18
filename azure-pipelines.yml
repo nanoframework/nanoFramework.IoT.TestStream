@@ -95,8 +95,7 @@ stages:
         testResultsFormat: 'VSTest' # 'JUnit' | 'NUnit' | 'VSTest' | 'XUnit' | 'CTest'. Alias: testRunner. Required. Test result format. Default: JUnit.
         testResultsFiles: '**/*.trx'
 
-    - displayName: Cleaning tests results
-      bash: |
+    - bash: |
         # Define the subdirectory path
         SUBDIRECTORY_PATH="$(System.DefaultWorkingDirectory)"
 
@@ -105,3 +104,4 @@ stages:
 
         # Optional: Print a message indicating completion
         echo "All .trx files have been removed from $SUBDIRECTORY_PATH"
+      displayName: Cleaning tests results
