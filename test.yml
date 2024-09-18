@@ -43,8 +43,30 @@ stages:
           displayName: 'Update nano.runsettings'
 
         - bash: |
-            mono /azp/TestPlatform/vstest.console.exe $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:$(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings /TestAdapterPath:$(System.DefaultWorkingDirectory)/Artifacts/packages/nanoFramework.TestFramework.2.1.111/ /Logger:trx;LogFileName=TEST.xml
-            exit $?
+            # Maximum number of retries
+            MAX_RETRIES=5
+            # Delay between retries in seconds
+            DELAY=2
+            # Initialize the counter
+            attempt=0
+
+            # Loop to retry the function call
+            while (( attempt < MAX_RETRIES )); do
+                RESULT_TEST=$(mono /azp/TestPlatform/vstest.console.exe $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:$(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings /TestAdapterPath:$(System.DefaultWorkingDirectory)/Artifacts/packages/nanoFramework.TestFramework.2.1.111/ /Logger:trx)
+                echo "$RESULT_TEST"
+                if [[ "$RESULT_TEST" == *"Couldn't connect to the device"* ]]; then
+                    echo "Test failed. Retrying in $DELAY seconds..."
+                    ((attempt++))
+                    sleep $DELAY
+                else
+                    break
+                fi
+            done
+
+            if [ $attempt -eq $MAX_RETRIES ]; then
+                echo "Function failed after $MAX_RETRIES attempts."
+                exit 1
+            fi                        
           displayName: 'Run tests'
           timeoutInMinutes: 120
           retryCountOnTaskFailure: 10
