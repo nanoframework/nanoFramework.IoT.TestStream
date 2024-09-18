@@ -15,14 +15,20 @@ stages:
 
     jobs:
       - job:
-        steps:
-        - script: echo 'Testing'
-          displayName: 'Testing'
+        displayName: 'Test job for ${{ parameters.appComponents }}'
 
+        steps:
         - task: DownloadPipelineArtifact@2
           displayName: 'Download Pipeline Artifact'
           inputs:
             path: '$(System.DefaultWorkingDirectory)'
+
+        - bash: |
+            # flash the device with nanoff
+            SerialPort=$(cat /azp/config/configuration.json | jq -r '.capabilities.${{ parameters.appComponents }}')
+            nanoff --target ${{ parameters.appComponents }} --update --masserase --serialport $(echo SerialPort)
+            exit $?
+          displayName: 'Flash device'
 
         - bash: |
             # replace <IsRealHardware>False</IsRealHardware> by <IsRealHardware>True</IsRealHardware> in nano.runsettings
@@ -32,9 +38,12 @@ stages:
             SerialPort=$(cat /azp/config/configuration.json | jq -r '.capabilities.${{ parameters.appComponents }}')
             sed -i "s|<RealHardwarePort>.*<\/RealHardwarePort>|<RealHardwarePort>$(echo $SerialPort)<\/RealHardwarePort>|g" $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings
             cat $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings
+            exit $?
           displayName: 'Update nano.runsettings'
 
-        - script:  mono /azp/TestPlatform/vstest.console.exe $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:$(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings /TestAdapterPath:$(System.DefaultWorkingDirectory)/Artifacts/packages/nanoFramework.TestFramework.2.1.111/ /Logger:trx;LogFileName=TEST.xml
+        - bash: |
+            mono /azp/TestPlatform/vstest.console.exe $(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:$(System.DefaultWorkingDirectory)/Artifacts/UnitTestStream/nano.runsettings /TestAdapterPath:$(System.DefaultWorkingDirectory)/Artifacts/packages/nanoFramework.TestFramework.2.1.111/ /Logger:trx;LogFileName=TEST.xml
+            exit $?
           displayName: 'Run tests'
           timeoutInMinutes: 120
         
