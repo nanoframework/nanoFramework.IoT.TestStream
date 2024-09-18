@@ -74,7 +74,7 @@ stages:
   - job: Test
     displayName: 'Test job'
     pool:
-      name: TestStream
+      name: LisaTestAgentPools
 
     steps:
 
