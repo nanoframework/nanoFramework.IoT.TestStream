@@ -88,12 +88,10 @@ stages:
             BASE_DIR=$(System.DefaultWorkingDirectory)/Artifacts
 
             # Use the find command to search for paths starting with packages/nanoFramework.TestFramework
-            TESTADAPTER_PATH=$(find "$BASE_DIR" -type d -path "*/packages/nanoFramework.TestFramework*.*")
-            echo $TESTADAPTER_PATH
+            TESTADAPTER_PATH=$(find "$BASE_DIR" -type d -path "*/packages/nanoFramework.TestFramework*.*" | head -n 1)
 
             # Extract the directory path from the unitTestRunsettings parameter
             UNIT_TEST_RUNSETTINGS_DIR=$(dirname "$BASE_DIR/${{ parameters.unitTestRunsettings }}")
-            echo $UNIT_TEST_RUNSETTINGS_DIR
 
             # Loop to retry the function call
             while (( attempt < MAX_RETRIES )); do
