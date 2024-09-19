@@ -63,12 +63,12 @@ stages:
 
         - bash: |
             # replace <IsRealHardware>False</IsRealHardware> by <IsRealHardware>True</IsRealHardware> in nano.runsettings
-            sed -i "s/<IsRealHardware>False<\/IsRealHardware>/<IsRealHardware>True<\/IsRealHardware>/g" $(System.DefaultWorkingDirectory)/Artifacts/$(unitTestRunsettings)
-            sed -i "s/<ResultsDirectory>.*<\/ResultsDirectory>/<ResultsDirectory>\.\/TestResults<\/ResultsDirectory>/g" $(System.DefaultWorkingDirectory)/Artifacts/$(unitTestRunsettings)
+            sed -i "s/<IsRealHardware>False<\/IsRealHardware>/<IsRealHardware>True<\/IsRealHardware>/g" $(System.DefaultWorkingDirectory)/Artifacts/${{ parameters.unitTestRunsettings}}
+            sed -i "s/<ResultsDirectory>.*<\/ResultsDirectory>/<ResultsDirectory>\.\/TestResults<\/ResultsDirectory>/g" $(System.DefaultWorkingDirectory)/Artifacts/${{ parameters.unitTestRunsettings}}
             # replace the serial port by the one in the configuration for parameters.appComponents
             SerialPort=$(cat /azp/config/configuration.json | jq -r '.capabilities.${{ parameters.appComponents }}')
-            sed -i "s|<RealHardwarePort>.*<\/RealHardwarePort>|<RealHardwarePort>$(echo $SerialPort)<\/RealHardwarePort>|g" $(System.DefaultWorkingDirectory)/Artifacts/$(unitTestRunsettings)
-            cat $(System.DefaultWorkingDirectory)/Artifacts/$(unitTestRunsettings)
+            sed -i "s|<RealHardwarePort>.*<\/RealHardwarePort>|<RealHardwarePort>$(echo $SerialPort)<\/RealHardwarePort>|g" $(System.DefaultWorkingDirectory)/Artifacts/${{ parameters.unitTestRunsettings}}
+            cat $(System.DefaultWorkingDirectory)/Artifacts/${{ parameters.unitTestRunsettings}}
             exit $?
           displayName: 'Update nano.runsettings'
 
@@ -85,9 +85,12 @@ stages:
             # Use the find command to search for paths starting with packages/nanoFramework.TestFramework
             TESTADAPTER_PATH=$(find "$BASE_DIR" -type d -path "*/packages/nanoFramework.TestFramework*")
 
+            # Extract the directory path from the unitTestRunsettings parameter
+            UNIT_TEST_RUNSETTINGS_DIR=$(dirname "$(BASE_DIR)/${{ parameters.unitTestRunsettings }}")
+
             # Loop to retry the function call
             while (( attempt < MAX_RETRIES )); do
-                RESULT_TEST=$(mono /azp/TestPlatform/vstest.console.exe $(BASE_DIR)/UnitTestStream/bin/Release/NFUnitTest.dll /Settings:$(BASE_DIR)/$(unitTestRunsettings) /TestAdapterPath:$(TESTADAPTER_PATH) /Logger:trx)
+                RESULT_TEST=$(mono /azp/TestPlatform/vstest.console.exe $(BASE_DIR)/${{ parameters.unitTestDll}} /Settings:$(BASE_DIR)/${{ parameters.unitTestRunsettings}} /TestAdapterPath:$(TESTADAPTER_PATH) /Logger:trx)
                 echo "$RESULT_TEST"
                 if [[ "$RESULT_TEST" == *"Couldn't connect to the device"* ]]; then
                     echo "Test failed. Retrying in $DELAY seconds..."
@@ -96,7 +99,7 @@ stages:
                       echo "Test failed after $MAX_RETRIES attempts."
                       exit 1
                     else
-                      find $(unitTestRunsettings)/TestResults -type f -name "*.trx" -exec rm -f {} \;
+                      find "$UNIT_TEST_RUNSETTINGS_DIR"/TestResults -type f -name "*.trx" -exec rm -f {} \;
                       ((attempt++))
                       sleep $DELAY
                     fi
@@ -114,8 +117,13 @@ stages:
             testResultsFiles: '**/*.trx'
 
         - bash: |
+            # Define the base directory to search in
+            BASE_DIR=$(System.DefaultWorkingDirectory)/Artifacts
+            # Extract the directory path from the unitTestRunsettings parameter
+            UNIT_TEST_RUNSETTINGS_DIR=$(dirname "$(BASE_DIR)/${{ parameters.unitTestRunsettings }}")
+
             # Find and remove all .trx files in the subdirectory
-            find "$unitTestRunsettings" -type f -name "*.trx" -exec rm -f {} \;
+            find "$UNIT_TEST_RUNSETTINGS_DIR"/TestResults -type f -name "*.trx" -exec rm -f {} \;
 
             # Optional: Print a message indicating completion
             echo "All .trx files have been removed from $unitTestRunsettings"
