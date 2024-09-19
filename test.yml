@@ -86,11 +86,11 @@ stages:
             TESTADAPTER_PATH=$(find "$BASE_DIR" -type d -path "*/packages/nanoFramework.TestFramework*")
 
             # Extract the directory path from the unitTestRunsettings parameter
-            UNIT_TEST_RUNSETTINGS_DIR=$(dirname "$(BASE_DIR)/${{ parameters.unitTestRunsettings }}")
+            UNIT_TEST_RUNSETTINGS_DIR=$(dirname "$BASE_DIR/${{ parameters.unitTestRunsettings }}")
 
             # Loop to retry the function call
             while (( attempt < MAX_RETRIES )); do
-                RESULT_TEST=$(mono /azp/TestPlatform/vstest.console.exe $(BASE_DIR)/${{ parameters.unitTestDll}} /Settings:$(BASE_DIR)/${{ parameters.unitTestRunsettings}} /TestAdapterPath:$(TESTADAPTER_PATH) /Logger:trx)
+                RESULT_TEST=$(mono /azp/TestPlatform/vstest.console.exe $BASE_DIR/${{ parameters.unitTestDll}} /Settings:$BASE_DIR/${{ parameters.unitTestRunsettings}} /TestAdapterPath:$TESTADAPTER_PATH /Logger:trx)
                 echo "$RESULT_TEST"
                 if [[ "$RESULT_TEST" == *"Couldn't connect to the device"* ]]; then
                     echo "Test failed. Retrying in $DELAY seconds..."
@@ -120,7 +120,7 @@ stages:
             # Define the base directory to search in
             BASE_DIR=$(System.DefaultWorkingDirectory)/Artifacts
             # Extract the directory path from the unitTestRunsettings parameter
-            UNIT_TEST_RUNSETTINGS_DIR=$(dirname "$(BASE_DIR)/${{ parameters.unitTestRunsettings }}")
+            UNIT_TEST_RUNSETTINGS_DIR=$(dirname "$BASE_DIR/${{ parameters.unitTestRunsettings }}")
 
             # Find and remove all .trx files in the subdirectory
             find "$UNIT_TEST_RUNSETTINGS_DIR"/TestResults -type f -name "*.trx" -exec rm -f {} \;
