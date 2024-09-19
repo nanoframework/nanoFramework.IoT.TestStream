@@ -45,7 +45,7 @@ stages:
               SerialPort=$(cat /azp/config/configuration.json | jq -r '.capabilities.${{ parameters.appComponents }}')
 
               # Maximum number of retries
-              MAX_RETRIES=10
+              MAX_RETRIES=${{ parameters.MaxRetries }}
               # Delay between retries in seconds
               DELAY=2
               # Initialize the counter
@@ -69,6 +69,9 @@ stages:
               fi
             displayName: 'Flash device'
             retryCountOnTaskFailure: 3
+            parameters:
+              - name: MaxRetries
+                default: 3
 
           - bash: |
               # replace <IsRealHardware>False</IsRealHardware> by <IsRealHardware>True</IsRealHardware> in nano.runsettings
@@ -83,7 +86,7 @@ stages:
 
           - bash: |
               # Maximum number of retries
-              MAX_RETRIES=10
+              MAX_RETRIES=${{ parameters.MaxRetries }}
               # Delay between retries in seconds
               DELAY=2
               # Initialize the counter
@@ -121,7 +124,10 @@ stages:
               done                     
             displayName: 'Run tests'
             timeoutInMinutes: 120
-            retryCountOnTaskFailure: 10
+            retryCountOnTaskFailure: 3
+            parameters:
+              - name: MaxRetries
+                default: 3
           
           - task: PublishTestResults@2
             inputs:
