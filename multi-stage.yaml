@@ -80,5 +80,5 @@ stages:
   - template: test.yml
     parameters:
       appComponents: ${{ appComponents }}
-      unitTestRunsettings: 'UnitTestStream/nano.runsettings'
-      unitTestDll: 'UnitTestStream/bin/Release/NFUnitTest.dll'
+      unitTestRunsettings: 
+        - 'UnitTestStream/nano.runsettings,UnitTestStream/bin/Release/NFUnitTest.dll'
