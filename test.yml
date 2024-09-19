@@ -87,7 +87,7 @@ stages:
 
           - bash: |
               # Maximum number of retries
-              MAX_RETRIES=${{ inputs.MaxRetries }}
+              MAX_RETRIES=${{ parameters.MaxRetries }}
               # Delay between retries in seconds
               DELAY=2
               # Initialize the counter
