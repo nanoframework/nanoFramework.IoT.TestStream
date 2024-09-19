@@ -1,5 +1,7 @@
 # Setup for the agent
 
+If you want to setup the requirements to run all the system, please run the `install.ps1` powershell and follow the instructions. If you have already WSL setup, docker and usbipd, you can skip those individual installations by using the appropriate flags.
+
 ## What needs to be installed in the image
 
 Dockerfile should contain:
