@@ -43,11 +43,6 @@ RUN unzip /tmp/microsoft.testplatform.zip -d /tmp/microsoft.testplatform
 RUN mv /tmp/microsoft.testplatform/tools/net462/Common7/IDE/Extensions/TestPlatform/* /azp/TestPlatform
 RUN rm -rf /tmp/microsoft.testplatform && rm /tmp/microsoft.testplatform.zip
 
-# nanoff tool installation in the azp directory
-RUN mkdir /azp/tools
-RUN dotnet tool install nanoff --tool-path /azp/tools
-ENV PATH="${PATH}:/azp/tools"
-
 COPY ./start.sh ./
 RUN chmod +x ./start.sh
 
@@ -58,5 +53,10 @@ RUN chown -R agent:agent /azp /home/agent
 USER agent
 # Another option is to run the agent as root.
 # ENV AGENT_ALLOW_RUNASROOT="true"
+
+# nanoff tool installation in the azp directory
+RUN mkdir /azp/tools
+# RUN dotnet tool install nanoff --tool-path /azp/tools
+ENV PATH="${PATH}:/azp/tools"
 
 ENTRYPOINT [ "./start.sh" ]
