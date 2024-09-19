@@ -54,15 +54,23 @@ stages:
               DELAY=2
               # Initialize the counter
               attempt=0
+               # Baud rates to try
+              BAUD_RATES=(1500000 1000000 500000 250000 150000)
+              # Initialize baud rate index
+              baud_index=0
 
               # Loop to retry the function call
               while (( attempt < MAX_RETRIES )); do
-                nanoff --target ${{ parameters.appComponents }} --update --masserase --serialport $(echo $SerialPort) --baud 1000000
+                nanoff --target ${{ parameters.appComponents }} --update --masserase --serialport $(echo $SerialPort) --baud ${BAUD_RATES[$baud_index]}
                 status=$?
                 if [ $status -eq 0 ]; then
                     break
                 else
                     ((attempt++))
+                    ((baud_index++))
+                    if (( baud_index >= ${#BAUD_RATES[@]} )); then
+                        baud_index=${#BAUD_RATES[@]} # reset index to the minimum speed
+                    fi
                     sleep $DELAY
                 fi
               done
