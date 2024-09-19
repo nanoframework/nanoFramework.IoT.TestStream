@@ -55,13 +55,14 @@ Create a file named /etc/udev/rules.d/99-serial.rules. Add the following line to
 
 ```shell
 KERNEL=="ttyACM[0-9]*",MODE="0666"
+KERNEL=="ttyUSB[0-9]*",MODE="0666"
 ```
 
 You will need then to exit WSL and restart WSL byt running the command `wsl --shutdown` and then again `wsl` to reenter it.
 
 Then, in the container, a volume pointing out on the hardware needs to to be set **and** the device cgroup rule needs to be adjusted.
 
-As an example, the serial port from the previous example is mapped on `/dev/ttyACM0`. Running the following command will show in which group the port is and the type of access:
+As an example, the serial port from the previous example is mapped on `/dev/ttyACM0` or `/dev/ttyUSB0`. Running the following command will show in which group the port is and the type of access:
 
 ```shell
 > ls -al /dev/* | grep ttyACM
@@ -142,3 +143,4 @@ Couple of good resources to read:
 * [Adding Agent Capabilities](https://stackoverflow.com/questions/54700536/automate-adding-capabilities-to-azure-devops-self-hosted-agents) and also [this one in PowerShell](https://blogs.blackmarble.co.uk/rfennell/programmatically-adding-user-capabilities-to-azure-devops-agents/).
 * [ADO REST API](https://learn.microsoft.com/en-us/rest/api/azure/devops/?view=azure-devops-rest-7.2).
 * [ADO agent source code](https://github.com/microsoft/azure-pipelines-agent).
+* [Good thread on hardware setup in WSL](https://github.com/microsoft/WSL/issues/7686).
