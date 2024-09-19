@@ -16,7 +16,7 @@ parameters:
   - name: MaxRetries
     displayName: "Maximum number of retries"
     type: number
-    default: 3
+    default: 5
 
 stages:
   - stage: Test_${{ replace(parameters.appComponents, '-', '_') }}
