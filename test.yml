@@ -33,7 +33,8 @@ stages:
 
         - bash: |
             # ensure nanoff is the last version
-            dotnet tool update nanoff --tool-path /azp/tools
+            dotnet tool install nanoff --tool-path /azp/tools
+          displayName: 'Install nanoff'
 
         - bash: |
             # flash the device with nanoff
