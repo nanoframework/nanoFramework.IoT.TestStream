@@ -45,7 +45,7 @@ stages:
               SerialPort=$(cat /azp/config/configuration.json | jq -r '.capabilities.${{ parameters.appComponents }}')
 
               # Maximum number of retries
-              MAX_RETRIES=${{ parameters.MaxRetries }}
+              MAX_RETRIES=${{ inputs.MaxRetries }}
               # Delay between retries in seconds
               DELAY=2
               # Initialize the counter
@@ -69,7 +69,7 @@ stages:
               fi
             displayName: 'Flash device'
             retryCountOnTaskFailure: 3
-            parameters:
+            inputs:
               - name: MaxRetries
                 default: 3
 
@@ -86,7 +86,7 @@ stages:
 
           - bash: |
               # Maximum number of retries
-              MAX_RETRIES=${{ parameters.MaxRetries }}
+              MAX_RETRIES=${{ inputs.MaxRetries }}
               # Delay between retries in seconds
               DELAY=2
               # Initialize the counter
@@ -125,7 +125,7 @@ stages:
             displayName: 'Run tests'
             timeoutInMinutes: 120
             retryCountOnTaskFailure: 3
-            parameters:
+            inputs:
               - name: MaxRetries
                 default: 3
           
