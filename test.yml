@@ -108,6 +108,9 @@ stages:
                       ((attempt++))
                       sleep $DELAY
                     fi
+                else if if [[ "$RESULT_TEST" =~ "The argument .* is invalid." ]]; then
+                    echo "Test failed as arguments are not valid."
+                    exit 1
                 else
                     break
                 fi
