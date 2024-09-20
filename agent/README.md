@@ -1,6 +1,6 @@
 # Setup for the agent
 
-If you want to setup the requirements to run all the system, please run the `install.ps1` powershell and follow the instructions. If you have already WSL setup, docker and usbipd, you can skip those individual installations by using the appropriate flags.
+If you want to set up the requirements to run the entire system, please run the `install.ps1` PowerShell script in an **elevated PowerShell window** (Run as Administrator) and follow the instructions provided during the installation process. If you have already WSL setup, docker and usbipd, you can skip those individual installations by using the appropriate flags.
 
 ## What needs to be installed in the image
 
