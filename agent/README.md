@@ -39,7 +39,14 @@ TODO: create a script to run it always or add it as a service or something equiv
 
 ## Building the agent container
 
-The agent container should be built before running it.
+Before building the Docker container, you may need to add your user to the Docker group to avoid permission issues. You can do this by running:
+```shell
+sudo usermod -aG docker <UserName>
+```
+
+For the permission changes to take effect, you must restart your WSL session. To do this, exit the WSL session by typing `exit`, then restart it by running `wsl --shutdown` and `wsl`.
+
+Once the permissions are set and WSL has been restarted, you can proceed to build the agent container using the following command:
 
 ```shell
 docker build -t azp-agent:linux -f ./azp-agent-linux.dockerfile .
