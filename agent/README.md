@@ -12,13 +12,11 @@ Dockerfile should contain:
 * powershell so that script can run.
 * nanoff tool to flash the device.
 
+Note: All the above installations will be performed automatically inside the azp-agent-linux.dockerfile during the Docker build process, so there is no need to manually install these components.
+
 TODO: adjust all the path, move the VS Test exe up and in a clean directory undo /azp/tools
 
 ## USB access with WSL2
-
-To be able to access serial ports to flash and run the tests, it is needed to install, after setting up properly WSL2, [USBIPD-WIN](https://learn.microsoft.com/en-us/windows/wsl/connect-usb).
-
-Just follow the instructions and make sure you are using the very latest WSL2 kernel by running `wsl --update` **before** the installation of USBIP. [Current verion here](https://github.com/dorssel/usbipd-win/releases/download/v4.3.0/usbipd-win_4.3.0.msi).
 
 You will need then to attach properly in WSL the vendor ID and product ID associated to your compatible .NET nanoFramework device.
 
