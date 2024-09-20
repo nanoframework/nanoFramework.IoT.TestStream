@@ -65,6 +65,8 @@ KERNEL=="ttyACM[0-9]*",MODE="0666"
 KERNEL=="ttyUSB[0-9]*",MODE="0666"
 ```
 
+You can use `sudo nano /etc/udev/rules.d/99-serial.rules` to create/open the file for editing in the terminal. After adding the required content, press `Ctrl+X`, then press `Y` to confirm and save the file, followed by `Enter` to exit.
+
 You will need then to exit WSL and restart WSL byt running the command `wsl --shutdown` and then again `wsl` to reenter it.
 
 Then, in the container, a volume pointing out on the hardware needs to to be set **and** the device cgroup rule needs to be adjusted.
