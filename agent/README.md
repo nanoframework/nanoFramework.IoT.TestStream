@@ -18,11 +18,11 @@ TODO: adjust all the path, move the VS Test exe up and in a clean directory undo
 
 ## USB access with WSL2
 
-You will need then to attach properly in WSL the vendor ID and product ID associated to your compatible .NET nanoFramework device.
+You will then need to properly attach the vendor ID and product ID associated with your compatible .NET nanoFramework device in WSL. Two PowerShell sessions will be required: one to execute `lsusb` to list the connected USB devices and another to use `usbipd` to manage the USB device in WSL (note that `usbipd` requires an Elevated PowerShell window).
 
 ![usbipd list and attach](./usbipd.png)
 
-In short, you'll need first to list the devices to find the USB bus id which will look like `x-y` where x and y are numbers then bind and attach it. So, running from an **elevated administrator prompt on Windows**:
+In order to bind and attach the USB device in WSL using `usbipd`, you'll need first to list the devices to find the USB bus id which will look like `x-y` where x and y are numbers then bind and attach it. So, running from an **elevated administrator prompt on Windows**:
 
 * `usbipd list` and find your USB device.
 * `usbipd bind --busid x-y` where x-y is the bus id you'll find in the list.
