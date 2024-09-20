@@ -49,6 +49,12 @@ if (-not $SkipWSLInstallation) {
     Write-Output "Installing Docker in WSL..."
     $dockerScript = $linuxPath + "/install/docker.sh"
     wsl -d $WSLDistribution -- chmod +x $dockerScript
+
+    # Convert the docker.sh and all files under the $linuxPath directory to LF using dos2unix
+    Write-Output "Converting file line endings to LF format in $linuxPath..."
+    wsl -d $WSLDistribution -- sudo apt install -y dos2unix
+    wsl -d $WSLDistribution -- find $linuxPath -type f -exec dos2unix {} \;
+
     Write-Output "Once you'll be in WSL, please run the following command to install Docker:"
     Write-Output "sudo ./install/docker.sh"
     Write-Output "You will be prompted for your password during the installation."
