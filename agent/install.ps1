@@ -18,6 +18,23 @@ function Convert-WindowsPathToLinuxPath {
     return $windowsPath
 }
 
+function Install-Dos2Unix {
+    param (
+        [string]$WSLDistribution
+    )
+
+    # Check if dos2unix is installed
+    $dos2unixCheck = wsl -d $WSLDistribution -- bash -c "if command -v dos2unix >/dev/null 2>&1; then echo 'installed'; else echo 'not installed'; fi"
+
+    if ($dos2unixCheck -eq "not installed") {
+        Write-Output "dos2unix is not installed. Installing dos2unix...You will be prompted for your password twice during the installation."
+        wsl -d $WSLDistribution -- sudo apt update
+        wsl -d $WSLDistribution -- sudo apt install -y dos2unix
+    } else {
+        Write-Output "dos2unix is already installed. Skipping installation."
+    }
+}
+
 if (-not $SkipWSLInstallation) {
     # Check if WSL is installed
     try {
@@ -49,6 +66,11 @@ if (-not $SkipWSLInstallation) {
     Write-Output "Installing Docker in WSL..."
     $dockerScript = $linuxPath + "/install/docker.sh"
     wsl -d $WSLDistribution -- chmod +x $dockerScript
+
+    Write-Output "Converting file line endings to LF format in $linuxPath..."
+    Install-Dos2Unix -WSLDistribution $WSLDistribution
+    wsl -d $WSLDistribution -- bash -c "find '$linuxPath' -type f -exec dos2unix {} \\;"
+
     Write-Output "Once you'll be in WSL, please run the following command to install Docker:"
     Write-Output "sudo ./install/docker.sh"
     Write-Output "You will be prompted for your password during the installation."
