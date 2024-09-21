@@ -364,6 +364,21 @@ public class Program
 
         File.WriteAllText(Options.ConfigHardwareFilePath, JsonSerializer.Serialize(_hardwareConfiguration, options));
 
+        // Checking if the docker image is built or not, if not, build it
+        var images = RunCommand("wsl", $"-d {_configuration.Config.WslDistribution} docker image inspect {_configuration.Config.DockerImage}");
+        images = images.Trim('\n').Trim('\r');
+        if (images == "[]")
+        {
+            Console.WriteLine("Docker image not found, building it. This will take some time, so relax and seat back!");
+            string pathToDockerfile = Path.GetDirectoryName(Options.ConfigFilePath);
+            pathToDockerfile = ConvertToWslPath(pathToDockerfile);
+            RunCommand("wsl", $"-d {_configuration.Config.WslDistribution} docker build -t {_configuration.Config.DockerImage} -f {pathToDockerfile}/azp-agent-linux.dockerfile {pathToDockerfile}", outputConsole: true);
+        }
+        else
+        {
+            Console.WriteLine("Docker image found.");
+        }
+
         Console.WriteLine("Setup completed successfully.");
         Console.WriteLine("Run the setup again to add another device.");
     }
@@ -408,7 +423,7 @@ public class Program
         processDocker.Start();
     }
 
-    public static string RunCommand(string command, string arguments, int wait = Timeout.Infinite)
+    public static string RunCommand(string command, string arguments, int wait = Timeout.Infinite, bool outputConsole = false)
     {
         string output = string.Empty;
         try
@@ -425,13 +440,24 @@ public class Program
                 if (!string.IsNullOrEmpty(e.Data))
                 {
                     output += e.Data + Environment.NewLine;
+                    if (outputConsole)
+                    {
+                        Console.WriteLine(e.Data);
+                    }
                 }
             };
             process.ErrorDataReceived += (sender, e) =>
             {
                 if (!string.IsNullOrEmpty(e.Data))
                 {
-                    Program.Logger.LogError(e.Data);
+                    if (outputConsole)
+                    {
+                        Console.WriteLine(e.Data);
+                    }
+                    else
+                    {
+                        Logger.LogError(e.Data);
+                    }
                 }
             };
 
@@ -441,7 +467,7 @@ public class Program
 
             process.WaitForExit(wait);
 
-            Program.Logger.LogInformation($"Process exited with code {process.ExitCode}");
+            Logger.LogInformation($"Process exited with code {process.ExitCode}");
         }
         catch (Exception ex)
         {
