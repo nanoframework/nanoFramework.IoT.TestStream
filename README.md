@@ -69,5 +69,6 @@ The application will bind and attach the devices into WSL, run the docker contai
 [ ] Documentation in this page to build the docker file for the agent. Or possibly add this as an option in the TestRunner.
 [ ] Create a robust error handling to restart the container, WSL or any other element when needed.
 [ ] Add an option to create a service out of the runner to run in the background.
-[ ] Package the agent dockerfile, scripts into the application so that, it can be installed easilly from a nuget.
+[ ] Package the agent dockerfile, scripts into the application so that, it can be installed easily from a nuget.
 [ ] Package the TestStream.Runner application as a nuget/dotnet tool for easy installation.
+[ ] Add ability to log into a file rather than the console.
