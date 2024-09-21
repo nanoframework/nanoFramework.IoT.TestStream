@@ -1,6 +1,6 @@
 # Setup for the agent
 
-If you want to setup the requirements to run all the system, please run the `install.ps1` powershell and follow the instructions. If you have already WSL setup, docker and usbipd, you can skip those individual installations by using the appropriate flags.
+If you want to set up the requirements to run the entire system, please run the `install.ps1` PowerShell script in an **elevated PowerShell window** (Run as Administrator) and follow the instructions provided during the installation process. If you have already WSL setup, docker and usbipd, you can skip those individual installations by using the appropriate flags.
 
 ## What needs to be installed in the image
 
@@ -12,19 +12,17 @@ Dockerfile should contain:
 * powershell so that script can run.
 * nanoff tool to flash the device.
 
+Note: All the above installations will be performed automatically inside the azp-agent-linux.dockerfile during the Docker build process, so there is no need to manually install these components.
+
 TODO: adjust all the path, move the VS Test exe up and in a clean directory undo /azp/tools
 
 ## USB access with WSL2
 
-To be able to access serial ports to flash and run the tests, it is needed to install, after setting up properly WSL2, [USBIPD-WIN](https://learn.microsoft.com/en-us/windows/wsl/connect-usb).
-
-Just follow the instructions and make sure you are using the very latest WSL2 kernel by running `wsl --update` **before** the installation of USBIP. [Current verion here](https://github.com/dorssel/usbipd-win/releases/download/v4.3.0/usbipd-win_4.3.0.msi).
-
-You will need then to attach properly in WSL the vendor ID and product ID associated to your compatible .NET nanoFramework device.
+You will then need to properly attach the vendor ID and product ID associated with your compatible .NET nanoFramework device in WSL. Two PowerShell sessions will be required: one to execute `lsusb` to list the connected USB devices and another to use `usbipd` to manage the USB device in WSL (note that `usbipd` requires an Elevated PowerShell window).
 
 ![usbipd list and attach](./usbipd.png)
 
-In short, you'll need first to list the devices to find the USB bus id which will look like `x-y` where x and y are numbers then bind and attach it. So, running from an **elevated administrator prompt on Windows**:
+In order to bind and attach the USB device in WSL using `usbipd`, you'll need first to list the devices to find the USB bus id which will look like `x-y` where x and y are numbers then bind and attach it. So, running from an **elevated administrator prompt on Windows**:
 
 * `usbipd list` and find your USB device.
 * `usbipd bind --busid x-y` where x-y is the bus id you'll find in the list.
@@ -41,7 +39,14 @@ TODO: create a script to run it always or add it as a service or something equiv
 
 ## Building the agent container
 
-The agent container should be built before running it.
+Before building the Docker container, you may need to add your user to the Docker group to avoid permission issues. You can do this by running:
+```shell
+sudo usermod -aG docker <UserName>
+```
+
+For the permission changes to take effect, you must restart your WSL session. To do this, exit the WSL session by typing `exit`, then restart it by running `wsl --shutdown` and `wsl`.
+
+Once the permissions are set and WSL has been restarted, you can proceed to build the agent container inside the WSL session using the following command:
 
 ```shell
 docker build -t azp-agent:linux -f ./azp-agent-linux.dockerfile .
@@ -59,6 +64,8 @@ Create a file named /etc/udev/rules.d/99-serial.rules. Add the following line to
 KERNEL=="ttyACM[0-9]*",MODE="0666"
 KERNEL=="ttyUSB[0-9]*",MODE="0666"
 ```
+
+You can use `sudo nano /etc/udev/rules.d/99-serial.rules` to create/open the file for editing in the terminal. After adding the required content, press `Ctrl+X`, then press `Y` to confirm and save the file, followed by `Enter` to exit.
 
 You will need then to exit WSL and restart WSL byt running the command `wsl --shutdown` and then again `wsl` to reenter it.
 
