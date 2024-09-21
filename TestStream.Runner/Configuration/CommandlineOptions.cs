@@ -27,6 +27,12 @@ namespace TestStream.Runner.Configuration
         public bool Setup { get; set; }
 
         /// <summary>
+        /// Gets or sets the setup flag.
+        /// </summary>
+        [Option('i', "install", Required = false, HelpText = "Install the application as a windows service.")]
+        public bool Install { get; set; }
+
+        /// <summary>
         /// Gets or sets the verbosity level.
         /// </summary>
         [Option('v', "verbosity", Required = false, HelpText = "Sets the verbosity level.")]

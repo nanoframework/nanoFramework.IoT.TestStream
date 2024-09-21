@@ -12,6 +12,8 @@ namespace TestStream.Runner.UsbIp
     /// </summary>
     internal class UsbipProcessor
     {
+        private static ILogger Logger { get; } = Program.Logger;
+
         /// <summary>
         /// Gets the state of the usbipd.
         /// </summary>
@@ -34,7 +36,7 @@ namespace TestStream.Runner.UsbIp
                 {
                     if (!string.IsNullOrEmpty(e.Data))
                     {
-                        Program.Logger.LogError(e.Data);
+                        Logger.LogError(e.Data);
                     }
                 };
                 process.Start();
@@ -43,11 +45,11 @@ namespace TestStream.Runner.UsbIp
 
                 process.WaitForExit();
                 state = JsonSerializer.Deserialize<State>(output);
-                Program.Logger.LogInformation($"Process usbpid state exited with code {process.ExitCode}");
+                Logger.LogInformation($"Process usbpid state exited with code {process.ExitCode}");
             }
             catch (Exception ex)
             {
-                Program.Logger.LogError($"An error occurred while running usbpid state: {ex.Message}");
+                Logger.LogError($"An error occurred while running usbpid state: {ex.Message}");
             }
 
             return state;
@@ -72,12 +74,12 @@ namespace TestStream.Runner.UsbIp
                 process.Start();
 
                 process.WaitForExit();
-                Program.Logger.LogInformation($"Process usbpid bind exited with code {process.ExitCode}");
+                Logger.LogInformation($"Process usbpid bind exited with code {process.ExitCode}");
                 return process.ExitCode == 0;
             }
             catch (Exception ex)
             {
-                Program.Logger.LogError($"An error occurred while running usbpid bind: {ex.Message}");
+                Logger.LogError($"An error occurred while running usbpid bind: {ex.Message}");
                 return false;
             }
         }
@@ -104,7 +106,7 @@ namespace TestStream.Runner.UsbIp
                 {
                     if (!string.IsNullOrEmpty(e.Data))
                     {
-                        Program.Logger.LogError(e.Data);
+                        Logger.LogError(e.Data);
                     }
                 };
 
@@ -113,11 +115,11 @@ namespace TestStream.Runner.UsbIp
                 //process.BeginErrorReadLine();
 
                 await process.WaitForExitAsync(cancellationToken);
-                Program.Logger.LogInformation($"Process usbpid attach exited with code {process.ExitCode}");
+                Logger.LogInformation($"Process usbpid attach exited with code {process.ExitCode}");
             }
             catch (Exception ex)
             {
-                Program.Logger.LogError($"An error occurred while running usbpid attach: {ex.Message}");
+                Logger.LogError($"An error occurred while running usbpid attach: {ex.Message}");
             }
         }
     }

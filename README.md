@@ -16,6 +16,8 @@ An installation script is available allowing an easy and smooth installation of 
 
 ## Installation of requirements
 
+This application is targeting Windows 10+ with WSL2 for x64 processors. You then need to have a machine that will allow virtualization.
+
 Clone the repository and go to the [/agent](./agent/) folder and run the [install.ps1](./agent/install.ps1) script. The script **must** run in an elevated privilege PowerShell (Run as administrator).
 
 Parameters are available to allow skipping some of the installations:
