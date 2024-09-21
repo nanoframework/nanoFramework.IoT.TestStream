@@ -17,7 +17,7 @@ namespace TestStream.Runner.Configuration
         /// <summary>
         /// Gets or sets the configuration hardware json file path.
         /// </summary>
-        [Option('d', "hardwareconfig", Required = true, HelpText = "Path to the hardware configuration file.")]
+        [Option('h', "hardwareconfig", Required = true, HelpText = "Path to the hardware configuration file.")]
         public string ConfigHardwareFilePath { get; set; }
 
         /// <summary>

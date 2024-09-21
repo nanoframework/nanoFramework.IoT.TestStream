@@ -32,5 +32,15 @@ namespace TestStream.Runner
         /// Gets or sets the WSL distribution. Default is Ubuntu.
         /// </summary>
         public string WslDistribution { get; set; } = "Ubuntu";
+
+        /// <summary>
+        /// Gets or sets the agent name.
+        /// </summary>
+        public string AgentName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the docker image.
+        /// </summary>
+        public string DockerImage { get; set; } = "azp-agent:linux";
     }
 }

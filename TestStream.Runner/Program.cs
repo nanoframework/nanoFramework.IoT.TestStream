@@ -131,6 +131,44 @@ public class Program
                 _returnvalue = 1;
                 return;
             }
+
+            // Check that there is a token
+            if (string.IsNullOrEmpty(_configuration.Config.Token))
+            {
+                Logger.LogError("Token is not set in the configuration file.");
+                _returnvalue = 1;
+                return;
+            }
+
+            // Check that there is a github id
+            if (string.IsNullOrEmpty(_configuration.Config.GithubId))
+            {
+                Logger.LogError("GithubId is not set in the configuration file.");
+                _returnvalue = 1;
+                return;
+            }
+
+            // Check that there is an organization
+            if (string.IsNullOrEmpty(_configuration.Config.Org))
+            {
+                Logger.LogError("Organization is not set in the configuration file.");
+                _returnvalue = 1;
+                return;
+            }
+
+            // Check that there is a pool
+            if (string.IsNullOrEmpty(_configuration.Config.Pool))
+            {
+                Logger.LogError("Pool is not set in the configuration file.");
+                _returnvalue = 1;
+                return;
+            }
+
+            // Check if the agent name is set
+            if (string.IsNullOrEmpty(_configuration.Config.AgentName))
+            {
+                _configuration.Config.AgentName = _configuration.Config.GithubId;
+            }
         }
         catch (Exception ex)
         {
@@ -362,6 +400,9 @@ public class Program
             }
         }
 
+        // Allow a bit of time for the devices to be attached
+        Thread.Sleep(5000);
+
         // Run the docker container in wsl
         Thread processDocker = new Thread(async () => await RunDockerContainer(_cancellationTokenSource.Token));
         processDocker.Start();
@@ -420,7 +461,22 @@ public class Program
         {
             Process process = new Process();
             process.StartInfo.FileName = "wsl";
-            process.StartInfo.Arguments = $"-d {_configuration.Config.WslDistribution} docker run -e AZP_URL=\"https://dev.azure.com/nanoframework\" -e AZP_TOKEN=\"{_configuration.Config.Token}\" -e AZP_POOL=\"TestStream\" -e AZP_AGENT_NAME=\"Docker Agent - Linux\" --device-cgroup-rule='c 166:* rmw' -v /dev:/dev --device-cgroup-rule='c 188:* rmw' -v ./config:/azp/config azp-agent:linux";
+            string args = $"-d {_configuration.Config.WslDistribution} docker run -e AZP_URL=\"https://dev.azure.com/{_configuration.Config.Org}\" -e AZP_TOKEN=\"{_configuration.Config.Token}\" -e AZP_POOL=\"{_configuration.Config.Pool}\" -e AZP_AGENT_NAME=\"{_configuration.Config.AgentName}\" ";
+            // Adding al the cgroup rules
+            foreach (var hardware in _configuration!.Hardware)
+            {
+                args += $"--device-cgroup-rule='c {hardware.CGroup}:* rmw' ";
+            }
+            // Adding each mounting point for the serial ports
+            foreach (var hardware in _configuration!.Hardware)
+            {
+                args += $"-v {hardware.Port}:{hardware.Port} ";
+            }
+
+            var pathConfig = ConvertToWslPath(Path.GetDirectoryName(Options.ConfigHardwareFilePath));
+            args += $"-v {pathConfig}:/azp/config {_configuration.Config.DockerImage}";
+
+            process.StartInfo.Arguments = args;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
@@ -439,6 +495,25 @@ public class Program
         {
             Console.WriteLine($"An error occurred while running the external process: {ex.Message}");
         }
+    }
+
+    private static string ConvertToWslPath(string windowsPath)
+    {
+        if (string.IsNullOrWhiteSpace(windowsPath))
+        {
+            throw new ArgumentException("Path cannot be null or empty", nameof(windowsPath));
+        }
+
+        // Replace backslashes with forward slashes
+        string wslPath = windowsPath.Replace('\\', '/');
+
+        // Extract the drive letter and convert it to lowercase
+        char driveLetter = char.ToLower(wslPath[0]);
+
+        // Remove the colon and prepend /mnt/
+        wslPath = $"/mnt/{driveLetter}{wslPath.Substring(2)}";
+
+        return wslPath;
     }
 
     // Method to read input while displaying it
