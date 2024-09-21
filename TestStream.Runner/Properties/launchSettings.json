@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TestStream.Runner": {
+      "commandName": "Project",
+      "commandLineArgs": "-c C:\\Repos\\nanoFramework\\nanoFramework.IoT.TestStream\\agent\\runner-configuration.json -h C:\\Repos\\nanoFramework\\nanoFramework.IoT.TestStream\\agent\\config\\configuration.json"
+    }
+  }
+}

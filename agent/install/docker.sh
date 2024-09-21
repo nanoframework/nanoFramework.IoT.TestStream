@@ -13,4 +13,5 @@ echo \
 apt-get update
 
 apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-usermod -aG docker $USER
+# adding the user to the docker group, so you can run docker commands without sudo
+usermod -aG docker $SUDO_USER
