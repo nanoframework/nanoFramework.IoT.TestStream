@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Text.Json;
 
@@ -28,20 +29,25 @@ namespace TestStream.Runner.UsbIp
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
 
-                process.OutputDataReceived += (sender, e) => output+= e.Data;
-                process.ErrorDataReceived += (sender, e) => Console.WriteLine(e.Data);
-
+                process.OutputDataReceived += (sender, e) => output += e.Data;
+                process.ErrorDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        Program.Logger.LogError(e.Data);
+                    }
+                };
                 process.Start();
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
                 process.WaitForExit();
                 state = JsonSerializer.Deserialize<State>(output);
-                Console.WriteLine($"Process exited with code {process.ExitCode}");
+                Program.Logger.LogInformation($"Process usbpid state exited with code {process.ExitCode}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while running the external process: {ex.Message}");
+                Program.Logger.LogError($"An error occurred while running usbpid state: {ex.Message}");
             }
 
             return state;
@@ -65,13 +71,13 @@ namespace TestStream.Runner.UsbIp
 
                 process.Start();
 
-                process.WaitForExit();                
-                Console.WriteLine($"Process exited with code {process.ExitCode}");
+                process.WaitForExit();
+                Program.Logger.LogInformation($"Process usbpid bind exited with code {process.ExitCode}");
                 return process.ExitCode == 0;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while running the external process: {ex.Message}");
+                Program.Logger.LogError($"An error occurred while running usbpid bind: {ex.Message}");
                 return false;
             }
         }
@@ -82,30 +88,36 @@ namespace TestStream.Runner.UsbIp
         /// <param name="busid">A valid usb id.</param>
         /// <param name="cancellationToken">A cancellation token to stop the auto attach.</param>
         /// <returns>A task.</returns>
-        public static async Task Attach(string busid, CancellationToken cancellationToken = default)
+        public static async Task Attach(string busid, bool autoAttach, CancellationToken cancellationToken = default)
         {
             try
             {
                 Process process = new Process();
                 process.StartInfo.FileName = "usbipd.exe";
-                process.StartInfo.Arguments = $"attach --wsl -b {busid} --auto-attach";
+                process.StartInfo.Arguments = $"attach --wsl -b {busid} {(autoAttach ? "--auto-attach" : string.Empty)}";
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
 
                 //process.OutputDataReceived += (sender, e) => output += e.Data;
-                process.ErrorDataReceived += (sender, e) => Console.WriteLine(e.Data);
+                process.ErrorDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        Program.Logger.LogError(e.Data);
+                    }
+                };
 
                 process.Start();
                 //process.BeginOutputReadLine();
                 //process.BeginErrorReadLine();
 
-                await process.WaitForExitAsync(cancellationToken);                
-                Console.WriteLine($"Process exited with code {process.ExitCode}");
+                await process.WaitForExitAsync(cancellationToken);
+                Program.Logger.LogInformation($"Process usbpid attach exited with code {process.ExitCode}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while running the external process: {ex.Message}");
+                Program.Logger.LogError($"An error occurred while running usbpid attach: {ex.Message}");
             }
         }
     }

@@ -27,5 +27,10 @@ namespace TestStream.Runner
         /// Gets or sets the github id.
         /// </summary>
         public string GithubId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WSL distribution. Default is Ubuntu.
+        /// </summary>
+        public string WslDistribution { get; set; } = "Ubuntu";
     }
 }
