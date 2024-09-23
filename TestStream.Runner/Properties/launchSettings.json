@@ -2,7 +2,7 @@
   "profiles": {
     "TestStream.Runner": {
       "commandName": "Project",
-      "commandLineArgs": "-c C:\\Repos\\nanoFramework\\nanoFramework.IoT.TestStream\\agent\\runner-configuration.json -h C:\\Repos\\nanoFramework\\nanoFramework.IoT.TestStream\\agent\\config\\configuration.json"
+      "commandLineArgs": "-c C:\\Repos\\nanoFramework\\nanoFramework.IoT.TestStream\\agent\\runner-configuration-sample.json -h C:\\Repos\\nanoFramework\\nanoFramework.IoT.TestStream\\agent\\config\\configuration.json"
     }
   }
 }
