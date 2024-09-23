@@ -1,7 +1,5 @@
 {
     "capabilities":
-    {
-      "XIAO_ESP32C3":"/dev/ttyACM0",
-      "ESP32_C3_REV3":"/dev/ttyUSB0"
+    {      
     }
 }

@@ -2,14 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using CommandLine;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
 using System.Diagnostics;
 using System.Text.Json;
 using TestStream.Runner;
 using TestStream.Runner.Configuration;
+using TestStream.Runner.Helpers;
 using TestStream.Runner.UsbIp;
 
 /// <summary>
@@ -172,7 +170,7 @@ public class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred while deserializing the JSON file: {ex.Message}");
+            Logger.LogError($"An error occurred while deserializing the JSON file: {ex.Message}");
         }
 
         // Get the state of usbipd
@@ -193,7 +191,7 @@ public class Program
             AttachUsbipAndRunDocker();
 
             // Wait for a key press to exit
-            Console.WriteLine("Press any key to exit...");
+            ConsoleHelpers.WriteUserAction("Press any key to exit...");
             Console.ReadKey();
             _cancellationTokenSource.Cancel();
         }
@@ -211,8 +209,8 @@ public class Program
     private static void CreateSetup()
     {
         var previousState = _state;
-        Console.WriteLine("Please plug in the device you want to use.");
-        Console.WriteLine("Press any key when plugged");
+        ConsoleHelpers.WriteDash("Please plug in the device you want to use.");
+        ConsoleHelpers.WriteUserAction("Press any key when plugged");
         Console.ReadKey();
         _state = UsbipProcessor.GetState();
         // Find the new device
@@ -239,12 +237,12 @@ public class Program
 
         if (newDevice == null)
         {
-            Logger.LogError("No new device found. Please retry running the setup.");
+            ConsoleHelpers.WriteError("No new device found. Please retry running the setup.");
             _returnvalue = 1;
             return;
         }
 
-        Console.WriteLine($"New device found: {newDevice?.Description} with busid {newDevice?.BusId}.");
+        ConsoleHelpers.WriteDash($"New device found: {newDevice?.Description} with busid {newDevice?.BusId}.");
         Console.WriteLine("Now, binding and attaching the device to usbipd and checking the serial port.");
 
         // Warm up wsl
@@ -261,7 +259,7 @@ public class Program
         }
         else
         {
-            Logger.LogError($"Error binding device with busid {newDevice!.BusId} to usbipd.");
+            ConsoleHelpers.WriteError($"Error binding device with busid {newDevice!.BusId} to usbipd.");
             _returnvalue = 1;
             return;
         }
@@ -287,11 +285,11 @@ public class Program
         if (newPort != string.Empty)
         {
             newPort = newPort.Trim('\r');
-            Console.WriteLine($"New port found: {newPort}");
+            ConsoleHelpers.WriteWarning($"New port found: {newPort}");
         }
         else
         {
-            Logger.LogError("No new port found. Please retry running the setup.");
+            ConsoleHelpers.WriteError("No new port found. Please retry running the setup.");
             _returnvalue = 1;
             return;
         }
@@ -306,14 +304,15 @@ public class Program
         }
         catch (Exception ex)
         {
-            Logger.LogError($"Error parsing cgroup: {ex.Message}");
+            ConsoleHelpers.WriteError($"Error parsing cgroup: {ex.Message}");
             _returnvalue = 1;
             return;
         }
 
-        Console.WriteLine($"Device is part of cgroup {cgroupint}");
+        ConsoleHelpers.WriteWarning($"Device is part of cgroup {cgroupint}");
 
-        Console.WriteLine("Please write the exact firmware of the device and press enter:");
+        ConsoleHelpers.WriteDash(string.Empty);
+        ConsoleHelpers.WriteUserAction("Please write the exact firmware of the device and press enter:");
         var firmware = ReadLineWithDisplay();
         Console.WriteLine($"Firmware: {firmware}");
 
@@ -329,11 +328,11 @@ public class Program
         {
             if (hardware.UsbId == newDevice.BusId)
             {
-                Logger.LogInformation("Device already in configuration.");
+                ConsoleHelpers.WriteWarning("Device already in configuration.");
                 // Replacing the other values
                 hardware.CGroup = cgroupint;
                 hardware.Firmware = firmware;
-                hardware.Port = newPort;
+                hardware.Port = $"/dev/{newPort}";
                 foundHardware = true;
             }
         }
@@ -369,17 +368,19 @@ public class Program
         images = images.Trim('\n').Trim('\r');
         if (images == "[]")
         {
-            Console.WriteLine("Docker image not found, building it. This will take some time, so relax and seat back!");
+            ConsoleHelpers.WriteDash(string.Empty);
+            ConsoleHelpers.WriteWarning("Docker image not found, building it. This will take some time, so relax and seat back!");
             string pathToDockerfile = Path.GetDirectoryName(Options.ConfigFilePath);
             pathToDockerfile = ConvertToWslPath(pathToDockerfile);
             RunCommand("wsl", $"-d {_configuration.Config.WslDistribution} docker build -t {_configuration.Config.DockerImage} -f {pathToDockerfile}/azp-agent-linux.dockerfile {pathToDockerfile}", outputConsole: true);
+            Console.WriteLine("Docker image built.");
         }
         else
         {
             Console.WriteLine("Docker image found.");
         }
 
-        Console.WriteLine("Setup completed successfully.");
+        ConsoleHelpers.WriteDash("Setup completed successfully.");
         Console.WriteLine("Run the setup again to add another device.");
     }
 
@@ -489,14 +490,15 @@ public class Program
             process.StartInfo.FileName = "wsl";
             string args = $"-d {_configuration.Config.WslDistribution} docker run -e AZP_URL=\"https://dev.azure.com/{_configuration.Config.Org}\" -e AZP_TOKEN=\"{_configuration.Config.Token}\" -e AZP_POOL=\"{_configuration.Config.Pool}\" -e AZP_AGENT_NAME=\"{_configuration.Config.AgentName}\" ";
             // Adding al the cgroup rules
-            foreach (var hardware in _configuration!.Hardware)
+            foreach (var hardware in _configuration!.Hardware.Select(m => m.CGroup).Distinct())
             {
-                args += $"--device-cgroup-rule='c {hardware.CGroup}:* rmw' ";
+                args += $"--device-cgroup-rule='c {hardware}:* rmw' ";
             }
+
             // Adding each mounting point for the serial ports
-            foreach (var hardware in _configuration!.Hardware)
+            foreach (var hardware in _configuration!.Hardware.Select(m => m.Port).Distinct())
             {
-                args += $"-v {hardware.Port}:{hardware.Port} ";
+                args += $"-v {hardware}:{hardware} ";
             }
 
             var pathConfig = ConvertToWslPath(Path.GetDirectoryName(Options.ConfigHardwareFilePath));

@@ -1,18 +1,10 @@
 {
-    "hardware": [
-        { "firmware":"XIAO_ESP32C3",
-          "port":"/dev/ttyUSB0",
-          "cgroup":188,
-          "usbid":"1-1" },
-        { "firmware":"ESP32_REV0",
-          "port":"/dev/ttyACM0",
-          "cgroup":166,
-          "usbid":"6-3" }
+    "hardware": [        
     ],
     "config": {
         "token":"supersecrettoken",
         "org":"nanoframework",
         "pool":"TestStream",
-        "githubId":"Ellerbach"
+        "githubId":"your_github_id"
     }
 }
