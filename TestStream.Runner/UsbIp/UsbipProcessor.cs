@@ -12,7 +12,7 @@ namespace TestStream.Runner.UsbIp
     /// </summary>
     internal class UsbipProcessor
     {
-        private static ILogger Logger { get; } = Program.Logger;
+        private static ILogger Logger { get; } = global::Runner.Logger;
 
         /// <summary>
         /// Gets the state of the usbipd.
@@ -92,6 +92,7 @@ namespace TestStream.Runner.UsbIp
         /// <returns>A task.</returns>
         public static async Task Attach(string busid, bool autoAttach, CancellationToken cancellationToken = default)
         {
+            string output = string.Empty;
             try
             {
                 Process process = new Process();
@@ -101,7 +102,14 @@ namespace TestStream.Runner.UsbIp
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
 
-                //process.OutputDataReceived += (sender, e) => output += e.Data;
+                process.OutputDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        output += e.Data;
+                    }
+                };
+
                 process.ErrorDataReceived += (sender, e) =>
                 {
                     if (!string.IsNullOrEmpty(e.Data))
@@ -111,10 +119,22 @@ namespace TestStream.Runner.UsbIp
                 };
 
                 process.Start();
-                //process.BeginOutputReadLine();
-                //process.BeginErrorReadLine();
 
-                await process.WaitForExitAsync(cancellationToken);
+                // We don't need to redirect, keeping for debug purposes
+#if DEBUG
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+#endif
+
+                if (autoAttach)
+                {
+                    await process.WaitForExitAsync(cancellationToken);
+                }
+                else
+                {
+                    process.WaitForExit();
+                }
+
                 Logger.LogInformation($"Process usbpid attach exited with code {process.ExitCode}");
             }
             catch (Exception ex)

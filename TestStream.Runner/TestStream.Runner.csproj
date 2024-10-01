@@ -1,15 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<ToolCommandName>TestRunner</ToolCommandName>
+		<PackageOutputPath>../</PackageOutputPath>
+		<RootNamespace>nanoFramework.IoT.TestRunner</RootNamespace>
+		<AssemblyName>TestRunner</AssemblyName>
+		<PackageId>TestRunner</PackageId>
+		<Authors>nanoframework</Authors>
+		<Product>.NET nanoFramework Firmware Flasher</Product>
+		<Copyright>Copyright (c) .NET Foundation and Contributors</Copyright>
+		<Company>.NET nanoFramework</Company>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/nanoframework/nanoFramework.IoT.TestStream</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/nanoframework/nanoFramework.IoT.TestStream</PackageProjectUrl>
+		<PackageIconUrl></PackageIconUrl>
+		<Description>.NET nanoFramework.IoT.TestRunner tool to manage self hosted agents.</Description>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CommandLineParser" Version="2.9.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+		<PackageReference Include="System.Text.Json" Version="8.0.4" />
+		<PackageReference Include="Terminal.Gui" Version="1.17.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="..\agent\**" Link="agent\%(RecursiveDir)%(Filename)%(Extension)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 
 </Project>

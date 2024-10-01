@@ -36,6 +36,9 @@ function Install-Dos2Unix {
 }
 
 if (-not $SkipWSLInstallation) {
+    Write-Output "------------------------------------------"
+    Write-Output "---- Step 1: Checking WSL installation..."
+    Write-Output "------------------------------------------"
     # Check if WSL is installed
     try {
         wsl --list --verbose
@@ -48,11 +51,16 @@ if (-not $SkipWSLInstallation) {
     # Install Ubuntu in WSL
     Write-Output "Installing $WSLDistribution in WSL."
     Write-Output "Please follow the instructions, create the user, and set the password."
-    Write-Output "After the installation is complete, please write 'exit' so that the script can continue."
+    Write-Host "After the installation is complete, please write 'exit' so that the script can continue." -ForegroundColor DarkMagenta
+    Write-Output "------------------------------------------"
     wsl --install -d $WSLDistribution
     Write-Output "$WSLDistribution installation complete."
+    Write-Output "------------------------------------------"
+    Write-Output ""
 } else {
     Write-Output "Skipping WSL installation as per the parameter."
+    Write-Output "------------------------------------------"
+    Write-Output ""
 }
 
 # Define the Windows path
@@ -60,8 +68,24 @@ $windowsPath = Get-Location
 # Replace backslashes with forward slashes and replace C: with /mnt/c
 $linuxPath = Convert-WindowsPathToLinuxPath -windowsPath $windowsPath
 
-if (-not $SkipWSLInstallation) {
-    
+# Check if the install directory exists
+$installPath = Join-Path -Path $windowsPath -ChildPath "install"
+$agentInstallPath = Join-Path -Path $windowsPath -ChildPath "agent\install"
+$needAgent = $false
+
+if (Test-Path -Path $installPath) {
+    # all good
+} elseif (Test-Path -Path $agentInstallPath) {
+    $linuxPath = $linuxPath + "/agent"
+    $needAgent = $true
+} else {
+    Write-Host "Neither $installPath nor $agentInstallPath exists." -ForegroundColor Red
+}
+
+if (-not $SkipDockerInstallation) {    
+    Write-Output "------------------------------------------"
+    Write-Output "---- Step 2: Checking Docker installation..."
+    Write-Output "------------------------------------------"
     # Install Docker in WSL
     Write-Output "Installing Docker in WSL..."
     $dockerScript = $linuxPath + "/install/docker.sh"
@@ -72,13 +96,21 @@ if (-not $SkipWSLInstallation) {
     wsl -d $WSLDistribution -- bash -c "find '$linuxPath' -type f -exec dos2unix {} \\;"
 
     Write-Output "Once you'll be in WSL, please run the following command to install Docker:"
-    Write-Output "sudo ./install/docker.sh"
-    Write-Output "You will be prompted for your password during the installation."
+if($needAgent) {
+    Write-Host "  sudo ./agent/install/docker.sh" -ForegroundColor DarkMagenta
+} else {
+    Write-Host "  sudo ./install/docker.sh" -ForegroundColor DarkMagenta
+}
+    Write-Host "You will be prompted for your password during the installation." -ForegroundColor DarkYellow
     Write-Output "After the installation is complete, please write 'exit' so that the script can continue."
     wsl -d $WSLDistribution
     Write-Output "Docker instalation completed."
+    Write-Output "------------------------------------------"
+    Write-Output ""
 } else {
     Write-Output "Skipping Docker installation as per the parameter."
+    Write-Output "------------------------------------------"
+    Write-Output ""
 }
 
 Write-Output "Setting up devices rulesets..."
@@ -89,6 +121,9 @@ wsl -d $WSLDistribution -u root -- $deviceRules
 wsl -d $WSLDistribution -u root -- service udev restart
 
 if (-not $SkipUSBIPDInstallation) {
+    Write-Output "------------------------------------------"
+    Write-Output "---- Step 3: Installing USBIPD..."
+    Write-Output "------------------------------------------"
     # Install usbipd
     Write-Output "Installing usbipd..."
     $msiUrl = "https://github.com/dorssel/usbipd-win/releases/download/v4.3.0/usbipd-win_4.3.0.msi"
@@ -98,8 +133,12 @@ if (-not $SkipUSBIPDInstallation) {
     # Install the MSI
     Start-Process -FilePath "msiexec.exe" -ArgumentList "/i", $msiPath, "/quiet", "/norestart" -Wait
     Write-Output "usbipd installation complete."
+    Write-Output "------------------------------------------"
+    Write-Output ""
 } else {
     Write-Output "Skipping usbipd installation as per the parameter."
+    Write-Output "------------------------------------------"
+    Write-Output ""
 }
 
 Write-Output "Agent requirements installation complete."

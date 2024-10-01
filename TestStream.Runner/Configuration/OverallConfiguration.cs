@@ -6,7 +6,7 @@ namespace TestStream.Runner
     /// <summary>
     /// Represent a configuration object.
     /// </summary>
-    internal class OverallConfiguration
+    public class OverallConfiguration
     {
         /// <summary>
         /// Gets or sets the hardware.

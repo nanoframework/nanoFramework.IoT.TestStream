@@ -11,7 +11,7 @@ RUN apt install -y curl git jq libicu70 nano
 # Global Tools Installation
 
 # Powershell
-RUN apt install -y wget apt-transport-https software-properties-common
+RUN apt install -y wget apt-transport-https software-properties-common dos2unix
 # Download the Microsoft repository keys
 RUN wget -q https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb
 # Register the Microsoft repository keys
@@ -44,6 +44,11 @@ RUN mv /tmp/microsoft.testplatform/tools/net462/Common7/IDE/Extensions/TestPlatf
 RUN rm -rf /tmp/microsoft.testplatform && rm /tmp/microsoft.testplatform.zip
 
 COPY ./start.sh ./
+
+# Convert start.sh to Unix line endings
+RUN dos2unix ./start.sh
+
+# Make start.sh executable
 RUN chmod +x ./start.sh
 
 # Create agent user and set up home directory
