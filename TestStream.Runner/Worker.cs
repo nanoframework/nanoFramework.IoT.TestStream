@@ -5,9 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using nanoFramework.IoT.TestRunner.Helpers;
 using System.Diagnostics;
-using System.Threading;
 using TestStream.Runner.UsbIp;
-using TestStream.Runner;
 
 namespace nanoFramework.IoT.TestRunner
 {
@@ -96,8 +94,8 @@ namespace nanoFramework.IoT.TestRunner
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
 
-                process.OutputDataReceived += (sender, e) => _logger.LogInformation(e.Data?.Replace("\0", ""));
-                process.ErrorDataReceived += (sender, e) => _logger.LogError(e.Data?.Replace("\0", ""));
+                process.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data?.Replace("\0", ""));
+                process.ErrorDataReceived += (sender, e) => Console.WriteLine(e.Data?.Replace("\0", ""));
 
                 process.Start();
                 process.BeginOutputReadLine();

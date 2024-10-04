@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging.EventLog;
 using nanoFramework.IoT.TestRunner;
 using nanoFramework.IoT.TestRunner.Helpers;
 using nanoFramework.IoT.TestRunner.TerminalGui;
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Terminal.Gui;
@@ -70,11 +69,6 @@ public class Runner
                     return level >= LogLevel.Information;
                 };
             });
-
-        builder.Services.AddWindowsService(options =>
-        {
-            options.ServiceName = "TestStream.Runner";
-        });
 
         builder.Services.AddHostedService<Worker>();
         LoggerProviderOptions.RegisterProviderOptions<

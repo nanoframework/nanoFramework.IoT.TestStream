@@ -2,7 +2,7 @@
   "profiles": {
     "TestStream.Runner": {
       "commandName": "Project",
-      "commandLineArgs": ""
+      "commandLineArgs": "-s"
     }
   }
 }

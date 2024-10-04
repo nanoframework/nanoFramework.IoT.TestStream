@@ -23,7 +23,7 @@ namespace nanoFramework.IoT.TestRunner.Helpers
         /// <param name="useShell">True to spone an external shell.</param>
         /// <param name="ignoreError">True to ignore errors.</param>
         /// <returns>The output of the console as a string.</returns>
-        public static string RunCommand(string command, string arguments, int wait = Timeout.Infinite, bool outputConsole = false, bool useShell = false, bool ignoreError = false, CustomOutput outPutFunction = null)
+        public static string RunCommand(string command, string arguments, int wait = Timeout.Infinite, bool outputConsole = false, bool useShell = false, bool ignoreError = false, CustomOutput outPutFunction = null, bool mergeOutputError = false)
         {
             string output = string.Empty;
             try
@@ -60,7 +60,12 @@ namespace nanoFramework.IoT.TestRunner.Helpers
                         {
                             Runner.Logger.LogError(e.Data.Replace("\0", string.Empty));
                         }
-                        
+
+                        if (mergeOutputError)
+                        {
+                            output += e.Data.Replace("\0", string.Empty) + Environment.NewLine;
+                        }
+
                         outPutFunction?.Invoke(e.Data.Replace("\0", string.Empty));
                     }
                 };

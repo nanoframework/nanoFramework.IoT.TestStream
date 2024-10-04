@@ -16,8 +16,8 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
 
         public ServiceWindow()
         {
-            Title = "Service Window";
-            Label labelServiceDetails = new Label("Checking service details.")
+            Title = "Scheduled Task";
+            Label labelServiceDetails = new Label("Checking scheduled task details.")
             {
                 X = 0,
                 Y = 0
@@ -45,7 +45,7 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
                 Application.RequestStop();
             };
 
-            StartService = new CheckBox("Start Service once finished.")
+            StartService = new CheckBox("Start task once finished.")
             {
                 X = 0,
                 Y = Pos.Bottom(this) - 3
@@ -62,6 +62,9 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
                 Application.RequestStop();
             };
         }
+
+        // Documentations: https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks
+        // https://learn.microsoft.com/en-us/windows/win32/taskschd/schtasks
         private void CheckServiceIsStopped()
         {
             int count = 5;
@@ -69,12 +72,12 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
 
             while (count-- > 0)
             {
-                var running = ProcessHelpers.RunCommand("sc.exe", "query \"TestStream.Runner\"");
-                if (running.Contains("RUNNING"))
+                var running = ProcessHelpers.RunCommand("schtasks.exe", "/Query /TN \"TestStream.Runner\"", mergeOutputError: true);
+                if (running.Contains("Running"))
                 {
                     if (count == 4)
                     {
-                        ProcessHelpers.RunCommand("sc.exe", "stop \"TestStream.Runner\"");
+                        ProcessHelpers.RunCommand("schtasks.exe", "/End /TN \"TestStream.Runner\"", mergeOutputError: true);
                     }
 
                     Thread.Sleep(1000);
@@ -88,35 +91,35 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
 
             if (!isStopped)
             {
-                MessageBox.Query("Service is not stopped, please stop the service manually.", "OK");
+                MessageBox.Query("Task is not stopped, please stop the task manually.", "OK");
                 Application.RequestStop();
             }
 
-            TerminalHelpers.LogInListView("Service is stopped or not created.", _serviceDetails, _lstView);
+            TerminalHelpers.LogInListView("Task is stopped or not created.", _serviceDetails, _lstView);
             CheckAndInstallAsService();
         }
 
         private void CheckAndInstallAsService()
         {
-            var running = ProcessHelpers.RunCommand("sc.exe", "query \"TestStream.Runner\"");
+            var running = ProcessHelpers.RunCommand("schtasks.exe", "/Query /TN \"TestStream.Runner\"", mergeOutputError: true);
             bool createdProperly = false;
-            if (running.Contains("FAILED 1060"))
+            if (running.Contains("ERROR"))
             {
-                var ret = MessageBox.Query("Install service?", "Service is not installed. Click OK to install it.", "OK", "Cancel");
+                var ret = MessageBox.Query("Install task?", "Task is not installed. Click OK to install it.", "OK", "Cancel");
                 if (ret == 0)
                 {
-                    var args = $"create \"TestStream.Runner\" binPath= \"{Path.Combine(AppContext.BaseDirectory, "TestRunner.exe")}\" start= auto type= own";
-                    var created = ProcessHelpers.RunCommand("sc.exe", args);
+                    var args = $"/create /TN \"TestStream.Runner\" /TR \"{Path.Combine(AppContext.BaseDirectory, "TestRunner.exe")}\" /SC ONSTART";
+                    var created = ProcessHelpers.RunCommand("schtasks.exe", args, mergeOutputError: true);
                     if (created.Contains("SUCCESS"))
                     {
                         createdProperly = true;
-                        TerminalHelpers.LogInListView("Service installed.", _serviceDetails, _lstView);
+                        TerminalHelpers.LogInListView("Task installed.", _serviceDetails, _lstView);
                     }
                 }
 
                 if (!createdProperly)
                 {
-                    MessageBox.Query("Service is not installed", "Please install the service manually or try again the setup. Make sure you are in elevated prompt.", "OK");
+                    MessageBox.Query("Task is not installed", "Please install the scheduled task manually or try again the setup. Make sure you are in elevated prompt.", "OK");
                 }
             }
         }
@@ -126,16 +129,16 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
             int count = 5;
             bool isStarted = false;
 
-            var running = ProcessHelpers.RunCommand("sc.exe", "start \"TestStream.Runner\"");
-            if (running.Contains("FAILED 1053"))
+            var running = ProcessHelpers.RunCommand("schtasks.exe", "/Run /TN \"TestStream.Runner\"", mergeOutputError: true);
+            if (running.Contains("ERROR"))
             {
                 return false;
             }
 
             while (count-- > 0)
             {
-                running = ProcessHelpers.RunCommand("sc.exe", "query \"TestStream.Runner\"");
-                if (!running.Contains("RUNNING"))
+                running = ProcessHelpers.RunCommand("schtasks.exe", "/Query /TN \"TestStream.Runner\"", mergeOutputError: true);
+                if (!running.Contains("Running"))
                 {
                     Thread.Sleep(1000);
                 }
