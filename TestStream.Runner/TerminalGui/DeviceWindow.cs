@@ -1,10 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using nanoFramework.IoT.TestRunner.Configuration;
 using nanoFramework.IoT.TestRunner.Helpers;
+using nanoFramework.IoT.TestRunner.UsbIp;
 using Terminal.Gui;
-using TestStream.Runner;
-using TestStream.Runner.UsbIp;
 using Label = Terminal.Gui.Label;
 
 namespace nanoFramework.IoT.TestRunner.TerminalGui
@@ -152,7 +152,7 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
             if (newDevice == null)
             {
                 TerminalHelpers.LogInListView("No new device found. Please retry running the setup.", _status, _statusLabel);
-                Runner.ReturnValue = 1;
+                Runner.ErrorCode = ErrorCode.DeviceNotFound;
                 return;
             }
 
@@ -180,7 +180,7 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
             else
             {
                 TerminalHelpers.LogInListView($"Error binding device with busid {newDevice!.BusId} to usbipd.", _status, _statusLabel);
-                Runner.ReturnValue = 1;
+                Runner.ErrorCode = ErrorCode.UsbipBindError;
                 return;
             }
 

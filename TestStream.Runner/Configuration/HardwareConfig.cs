@@ -3,7 +3,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace TestStream.Runner.Configuration
+namespace nanoFramework.IoT.TestRunner.Configuration
 {
     /// <summary>
     /// Hardware configuration.

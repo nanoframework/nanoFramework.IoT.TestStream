@@ -5,14 +5,14 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace TestStream.Runner.UsbIp
+namespace nanoFramework.IoT.TestRunner.UsbIp
 {
     /// <summary>
     /// Represents a usbipd processor.
     /// </summary>
     internal class UsbipProcessor
     {
-        private static ILogger Logger { get; } = global::Runner.Logger;
+        private static ILogger Logger { get; set; } = Runner.Logger;
 
         /// <summary>
         /// Gets the state of the usbipd.
@@ -140,6 +140,7 @@ namespace TestStream.Runner.UsbIp
             catch (Exception ex)
             {
                 Logger.LogError($"An error occurred while running usbpid attach: {ex.Message}");
+                Runner.ErrorCode = ErrorCode.UsbipAttachError;
             }
         }
     }

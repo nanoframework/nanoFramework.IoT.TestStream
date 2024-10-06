@@ -1,4 +1,6 @@
-﻿
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using nanoFramework.IoT.TestRunner.Helpers;
 using Terminal.Gui;
 
@@ -108,7 +110,7 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
                 var ret = MessageBox.Query("Install task?", "Task is not installed. Click OK to install it.", "OK", "Cancel");
                 if (ret == 0)
                 {
-                    var args = $"/create /TN \"TestStream.Runner\" /TR \"{Path.Combine(AppContext.BaseDirectory, "TestRunner.exe")}\" /SC ONSTART";
+                    var args = $"/create /TN \"TestStream.Runner\" /TR \"{Path.Combine(AppContext.BaseDirectory, "TestRunner.exe")}\" /SC ONLOGON";
                     var created = ProcessHelpers.RunCommand("schtasks.exe", args, mergeOutputError: true);
                     if (created.Contains("SUCCESS"))
                     {

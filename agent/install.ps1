@@ -51,7 +51,7 @@ if (-not $SkipWSLInstallation) {
     # Install Ubuntu in WSL
     Write-Output "Installing $WSLDistribution in WSL."
     Write-Output "Please follow the instructions, create the user, and set the password."
-    Write-Host "After the installation is complete, please write 'exit' so that the script can continue." -ForegroundColor DarkMagenta
+    Write-Host "After the installation is complete, please write 'exit' so that the script can continue." -ForegroundColor DarkYellow
     Write-Output "------------------------------------------"
     wsl --install -d $WSLDistribution
     Write-Output "$WSLDistribution installation complete."
@@ -97,9 +97,9 @@ if (-not $SkipDockerInstallation) {
 
     Write-Output "Once you'll be in WSL, please run the following command to install Docker:"
 if($needAgent) {
-    Write-Host "  sudo ./agent/install/docker.sh" -ForegroundColor DarkMagenta
+    Write-Host "  sudo ./agent/install/docker.sh" -ForegroundColor DarkYellow
 } else {
-    Write-Host "  sudo ./install/docker.sh" -ForegroundColor DarkMagenta
+    Write-Host "  sudo ./install/docker.sh" -ForegroundColor DarkYellow
 }
     Write-Host "You will be prompted for your password during the installation." -ForegroundColor DarkYellow
     Write-Output "After the installation is complete, please write 'exit' so that the script can continue."

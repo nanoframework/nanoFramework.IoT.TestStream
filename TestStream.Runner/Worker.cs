@@ -4,8 +4,8 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using nanoFramework.IoT.TestRunner.Helpers;
+using nanoFramework.IoT.TestRunner.UsbIp;
 using System.Diagnostics;
-using TestStream.Runner.UsbIp;
 
 namespace nanoFramework.IoT.TestRunner
 {
@@ -26,6 +26,9 @@ namespace nanoFramework.IoT.TestRunner
 
         private async Task AttachUsbipAndRunDocker(CancellationToken stoppingToken)
         {
+            // Need to warm up WSL before
+            ProcessHelpers.RunCommand("wsl", $"-d {Runner.OverallConfiguration.Config.WslDistribution}", 5000, ignoreError: true);
+
             // Check that the busid from configuration is in the state
             foreach (var hardware in Runner.OverallConfiguration!.Hardware)
             {
@@ -54,6 +57,8 @@ namespace nanoFramework.IoT.TestRunner
                 if (!found)
                 {
                     _logger.LogError($"Device with busid {hardware.UsbId} not found in state.");
+                    Runner.ErrorCode = ErrorCode.DeviceNotFound;
+                    return;
                 }
             }
 
@@ -107,6 +112,7 @@ namespace nanoFramework.IoT.TestRunner
             catch (Exception ex)
             {
                 _logger.LogError($"An error occurred while running the external process: {ex.Message}");
+                Runner.ErrorCode = ErrorCode.WslFails;
             }
         }
     }

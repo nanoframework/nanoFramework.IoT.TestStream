@@ -10,6 +10,7 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
     {
         private static List<string> _dockerBuild = new List<string>();
         private static ListView _lstView;
+        private static Button _btnFinish;
 
         public DockerBuildWindows()
         {
@@ -27,17 +28,18 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
             };
             Add(labelDockerDetails, _lstView);
 
-            var btnFinish = new Button("Finish")
+            _btnFinish = new Button("Finish")
             {
                 X = Pos.Center(),
                 Y = Pos.Bottom(this) - 3,
-                IsDefault = true
+                IsDefault = true,
+                Enabled = false
             };
-            btnFinish.Clicked += () =>
+            _btnFinish.Clicked += () =>
             {
                 Application.RequestStop();
             };
-            Add(btnFinish);
+            Add(_btnFinish);
 
             new Thread(() => RunDockerBuildCheck()).Start();
         }
@@ -80,6 +82,7 @@ namespace nanoFramework.IoT.TestRunner.TerminalGui
 
             TerminalHelpers.LogInListView("Setup completed successfully.", _dockerBuild, _lstView);
             TerminalHelpers.LogInListView("Run the setup again to add another device.", _dockerBuild, _lstView);
+            _btnFinish.Enabled = true;
         }
     }
 }
