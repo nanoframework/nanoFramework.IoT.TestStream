@@ -54,7 +54,7 @@ stages:
 
     variables:
       DOTNET_NOLOGO: true
-      solution: 'nanoFramework.IoT.TestStream.sln'
+      solution: 'poc/nanoFramework.IoT.TestStream.sln'
       buildPlatform: 'Any CPU'
       buildConfiguration: 'Release'
       nugetPackageName: 'nanoFramework.IoT.TestStream'
@@ -81,4 +81,4 @@ stages:
     parameters:
       appComponents: ${{ appComponents }}
       unitTestRunsettings: 
-        - 'UnitTestStream/nano.runsettings,UnitTestStream/bin/Release/NFUnitTest.dll'
+        - 'poc/UnitTestStream/nano.runsettings,poc/UnitTestStream/bin/Release/NFUnitTest.dll'
