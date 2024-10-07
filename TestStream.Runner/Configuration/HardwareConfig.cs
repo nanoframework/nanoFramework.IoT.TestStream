@@ -1,14 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
-namespace TestStream.Runner.Configuration
+using System.Text.Json.Serialization;
+
+namespace nanoFramework.IoT.TestRunner.Configuration
 {
-    internal class HardwareConfig
+    /// <summary>
+    /// Hardware configuration.
+    /// </summary>
+    public class HardwareConfig
     {
+        /// <summary>
+        /// Gets or sets the capabilities..
+        /// </summary>
         [JsonPropertyName("capabilities")]
         public Dictionary<string, string> Capabilities { get; set; }
     }
