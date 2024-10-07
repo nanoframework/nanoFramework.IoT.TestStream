@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>nanoFramework.IoT.TestStream</id>
+    <version>$version$</version>
+    <title>nanoFramework.IoT.TestStream</title>
+    <authors>nanoframework</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.md</license>
+    <releaseNotes>
+    </releaseNotes>
+    <readme>docs\README.md</readme>
+    <developmentDependency>false</developmentDependency>
+    <projectUrl>https://github.com/nanoframework/nanoFramework.IoT.TestStream</projectUrl>
+    <icon>images\nf-logo.png</icon>
+    <repository type="git" url="https://github.com/nanoframework/nanoFramework.IoT.TestStream" commit="$commit$" />
+    <copyright>Copyright (c) .NET Foundation and Contributors</copyright>
+    <description>This package includes the nanoFramework.IoT.TestStream assembly for .NET nanoFramework C# projects.
+The nanoFramework.IoT.TestStream assembly contains functions specific to the run remote tests on devices.</description>
+    <tags>nanoFramework C# csharp netmf netnf UnitTest</tags>
+    <dependencies>
+      <dependency id="nanoFramework.CoreLibrary" version="1.15.5" />
+      <dependency id="nanoFramework.System.Device.Gpio" version="1.1.41" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="nanoFramework.IoT.TestStream\bin\Release\nanoFramework.IoT.TestStream.dll" target="lib\nanoFramework.IoT.TestStream.dll" />
+    <file src="nanoFramework.IoT.TestStream\bin\Release\nanoFramework.IoT.TestStream.pdb" target="lib\nanoFramework.IoT.TestStream.pdb" />
+    <file src="nanoFramework.IoT.TestStream\bin\Release\nanoFramework.IoT.TestStream.pdbx" target="lib\nanoFramework.IoT.TestStream.pdbx" />
+    <file src="nanoFramework.IoT.TestStream\bin\Release\nanoFramework.IoT.TestStream.pe" target="lib\nanoFramework.IoT.TestStream.pe" />
+    <file src="nanoFramework.IoT.TestStream\bin\Release\nanoFramework.IoT.TestStream.xml" target="lib\nanoFramework.IoT.TestStream.xml" />
+    <file src="assets\readme.txt" target="" />
+    <file src="README.md" target="docs\" />
+    <file src="assets\nf-logo.png" target="images" />
+    <file src="LICENSE.md" target="" />
+  </files>
+</package>
