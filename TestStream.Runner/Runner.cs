@@ -130,36 +130,34 @@ namespace nanoFramework.IoT.TestRunner
                 // Creates any missing directories
                 Directory.CreateDirectory(Path.GetDirectoryName(o.ConfigHardwareFilePath)!);
             }
-            else
+
+            try
             {
-                try
+                string jsonString = File.ReadAllText(o.ConfigHardwareFilePath);
+                var options = new JsonSerializerOptions
                 {
-                    string jsonString = File.ReadAllText(o.ConfigHardwareFilePath);
-                    var options = new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    };
-                    _hardwareConfiguration = JsonSerializer.Deserialize<HardwareConfig>(jsonString, options);
+                    PropertyNameCaseInsensitive = true
+                };
+                _hardwareConfiguration = JsonSerializer.Deserialize<HardwareConfig>(jsonString, options);
 
-                    if (_hardwareConfiguration == null)
-                    {
-                        Logger.LogError("Hardware configuration did not deserialized successfully.");
-                    }
-                    else
-                    {
-                        Logger.LogInformation("Configuration deserialized successfully.");
+                if (_hardwareConfiguration == null)
+                {
+                    Logger.LogError("Hardware configuration did not deserialized successfully.");
+                }
+                else
+                {
+                    Logger.LogInformation("Configuration deserialized successfully.");
 
-                        // Print the capabilities
-                        foreach (var capability in _hardwareConfiguration.Capabilities)
-                        {
-                            Logger.LogDebug($"Key: {capability.Key}, Value: {capability.Value}");
-                        }
+                    // Print the capabilities
+                    foreach (var capability in _hardwareConfiguration.Capabilities)
+                    {
+                        Logger.LogDebug($"Key: {capability.Key}, Value: {capability.Value}");
                     }
                 }
-                catch (Exception ex)
-                {
-                    Logger.LogError($"An error occurred while deserializing the JSON file: {ex.Message}");
-                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"An error occurred while deserializing the JSON file: {ex.Message}");
             }
 
             try

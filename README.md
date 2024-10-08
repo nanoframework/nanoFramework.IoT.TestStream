@@ -1,4 +1,4 @@
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nanoFramework.IoT.TestStream&metric=alert_status)](https://sonarcloud.io/dashboard?id=nanoFramework.IoT.TestStream) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=nanoFramework.IoT.TestStream&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=nanoFramework.IoT.TestStream) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![NuGet](https://img.shields.io/nuget/dt/nanoFramework.IoT.TestStream.svg?label=NuGet&style=flat&logo=nuget)](https://www.nuget.org/packages/nanoFramework.IoT.TestStream/) [![#yourfirstpr](https://img.shields.io/badge/first--timers--only-friendly-blue.svg)](https://github.com/nanoframework/Home/blob/main/CONTRIBUTING.md) [![Discord](https://img.shields.io/discord/478725473862549535.svg?logo=discord&logoColor=white&label=Discord&color=7289DA)](https://discord.gg/gCyBu8T)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![#yourfirstpr](https://img.shields.io/badge/first--timers--only-friendly-blue.svg)](https://github.com/nanoframework/Home/blob/main/CONTRIBUTING.md) [![Discord](https://img.shields.io/discord/478725473862549535.svg?logo=discord&logoColor=white&label=Discord&color=7289DA)](https://discord.gg/gCyBu8T)
 
 ![nanoFramework logo](https://raw.githubusercontent.com/nanoframework/Home/main/resources/logo/nanoFramework-repo-logo.png)
 
@@ -6,13 +6,17 @@
 
 # Welcome to the .NET **nanoFramework** nanoFramework.IoT.TestStream Library repository
 
-The [`TestStream.Runner`](TestStream.Runner) application is designed to manage device connections within a WSL environment, run the ADO agent. It has a feature to setup new devices and is specifically focusing on identifying new serial ports created when new hardware is connected. It handles errors gracefully and provides feedback to the user through console messages and logging.
+The [`TestStream.Runner`](./TestStream.Runner) application is designed to manage device connections within a WSL environment, run the ADO agent. It has a feature to setup new devices and is specifically focusing on identifying new serial ports created when new hardware is connected. It handles errors gracefully and provides feedback to the user through console messages and logging.
 
 The setup feature allows to smoothly add new devices, bind them and attach them in full transparency into WSL. Configuration files are created so that users do not have to worry about the complexity behind.
 
 It is also design to run all the needed background applications and docker containers in full transparency.
 
 An automatic assisted setup with a nice Terminal.Gui UI is available. You also have the ability to install everything manually with an installation script which will smoothly install of all the needed components.
+
+> [!Important]
+> This repository also contains a POC with a dummy .NET nanoFramework application, associated library and tests. The configuration of the build system present in the [multi-stage.yml](multi-stage.yaml) pipeline is here only to be able to test the overall pipelines. All the associates files like the nuspec and any other element can be ignore.
+> The only important code is present in the [TestStream.Runner](./TestStream.Runner) directory.
 
 ## Automatic configuration
 
