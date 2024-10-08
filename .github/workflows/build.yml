@@ -1,4 +1,4 @@
-name: Build and Version TestStream.Runner
+name: Build TestStream.Runner
 
 on:
   pull_request:
