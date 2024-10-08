@@ -49,14 +49,20 @@ jobs:
       run: dotnet build TestStream.Runner/TestStream.Runner.csproj
 
     - name: Publish the project
-      run: dotnet publish TestStream.Runner/TestStream.Runner.csproj --configuration Release --output ./publish --self-contained -r win-x64
+      run: dotnet publish TestStream.Runner/TestStream.Runner.csproj --configuration Release --output ./publish -p:PublishSingleFile=true --self-contained false -r win-x64
+
+    # zipping the publish directory to have the agent folder
+    - name: Zip the publish directory
+      run: |
+        cd ./publish
+        zip -r ../TestStream.Runner.zip .
 
     # Create GitHub release with created zip-file and CHANGELOG for Chocolatey and releases
     # NOTE: this is where we prepend "v" before the version in the tag/release
     - name: Create release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "./publish"
+        artifacts: "TestStream.Runner.zip"
         body: ${{ steps.github_release.outputs.changelog }}
         tag: "v${{ steps.gitversion.outputs.MajorMinorPatch }}"
         token: ${{ secrets.GITHUB_TOKEN }}

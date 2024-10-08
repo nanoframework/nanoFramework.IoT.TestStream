@@ -19,6 +19,7 @@
 		<PackageProjectUrl>https://github.com/nanoframework/nanoFramework.IoT.TestStream</PackageProjectUrl>
 		<PackageIconUrl></PackageIconUrl>
 		<Description>.NET nanoFramework.IoT.TestRunner tool to manage self hosted agents.</Description>
+		<PublishSingleFile>true</PublishSingleFile>
 	</PropertyGroup>
 
 	<ItemGroup>
