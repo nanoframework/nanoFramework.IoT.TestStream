@@ -1,0 +1,68 @@
+name: Build, Version, and Publish TestStream.Runner
+
+on:
+  # to be removed after testing
+  # pull_request:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET 8.0
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Install GitVersion
+      uses: GitTools/actions/gitversion/setup@v0
+      with:
+        versionSpec: '5.x'
+
+    - name: Use GitVersion
+      # Step id is used as reference for the output values
+      id: gitversion 
+      uses: gittools/actions/gitversion/execute@v0
+
+    # Create the CHANGELOG for this release
+    # We'll compile it from last the version
+    # to the current commit
+    - name: Build Changelog
+      id: github_release
+      uses: mikepenz/release-changelog-builder-action@v1
+      with:
+        configuration: "./changelog-config.json"
+        fromTag: ${{ steps.gitversion.outputs.VersionSourceSha }}
+        toTag: ${{ steps.gitversion.outputs.Sha }}
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build the project
+      run: dotnet build TestStream.Runner/TestStream.Runner.csproj
+
+    - name: Publish the project
+      run: dotnet publish TestStream.Runner/TestStream.Runner.csproj --configuration Release --output ./publish -p:PublishSingleFile=true --self-contained false -r win-x64
+
+    # zipping the publish directory to have the agent folder
+    - name: Zip the publish directory
+      run: |
+        cd ./publish
+        zip -r ../TestStream.Runner.zip .
+
+    # Create GitHub release with created zip-file and CHANGELOG for Chocolatey and releases
+    # NOTE: this is where we prepend "v" before the version in the tag/release
+    - name: Create release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "TestStream.Runner.zip"
+        body: ${{ steps.github_release.outputs.changelog }}
+        tag: "v${{ steps.gitversion.outputs.MajorMinorPatch }}"
+        token: ${{ secrets.GITHUB_TOKEN }}

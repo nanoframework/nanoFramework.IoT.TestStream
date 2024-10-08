@@ -66,7 +66,7 @@ namespace nanoFramework.IoT.TestRunner.UsbIp
             {
                 Process process = new Process();
                 process.StartInfo.FileName = "usbipd.exe";
-                process.StartInfo.Arguments = $"bind -b {busid}";
+                process.StartInfo.Arguments = $"bind -b {busid} --force";
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;

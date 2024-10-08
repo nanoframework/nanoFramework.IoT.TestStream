@@ -113,7 +113,7 @@ stages:
               while (( attempt < MAX_RETRIES )); do
                   RESULT_TEST=$(mono /azp/TestPlatform/vstest.console.exe $BASE_DIR/${{ split(tests, ',')[1] }} /Settings:$BASE_DIR/${{ split(tests, ',')[0]}} /TestAdapterPath:$TESTADAPTER_PATH /Logger:trx)
                   echo "$RESULT_TEST"
-                  if [[ "$RESULT_TEST" == *"Couldn't connect to the device"* ]]; then
+                  if [[ "$RESULT_TEST" == *"Couldn't connect to the device"* || "$RESULT_TEST" == *"Couldn't find any valid nanoDevice"* ]]; then
                       echo "Test failed. Retrying in $DELAY seconds..."
                       # we need to delete the trx file to avoid confusion but we keep the last one
                       if [ $attempt -eq $MAX_RETRIES ]; then
