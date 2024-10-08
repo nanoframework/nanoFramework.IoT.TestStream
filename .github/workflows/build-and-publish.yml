@@ -2,9 +2,9 @@ name: Build, Version, and Publish TestStream.Runner
 
 on:
   # to be removed after testing
-  pull_request:
-    branches:
-      - main
+  # pull_request:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 jobs:

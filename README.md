@@ -18,6 +18,10 @@ An automatic assisted setup with a nice Terminal.Gui UI is available. You also h
 > This repository also contains a POC with a dummy .NET nanoFramework application, associated library and tests. The configuration of the build system present in the [multi-stage.yml](multi-stage.yaml) pipeline is here only to be able to test the overall pipelines. All the associates files like the nuspec and any other element can be ignore.
 > The only important code is present in the [TestStream.Runner](./TestStream.Runner) directory.
 
+## Download and unzip the artifact
+
+Go to the [Releases](https://github.com/nanoframework/nanoFramework.IoT.TestStream/releases) page and download the latest `TestStream.Runner.zip`. Unzip the file on your Windows machine, it will contain the executable and a folder `agent` which contains the needed scripts and configuration files.
+
 ## Automatic configuration
 
 From **an administrator elevated prompt**, to start the automatic configuration run the application with the `-s` option:
