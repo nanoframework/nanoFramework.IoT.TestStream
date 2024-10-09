@@ -68,7 +68,7 @@ parameters:
 
 This will be adjusted with a git action later to browse existing agents and gather this information. So far, it's a manual gathering.
 
-Transform the pool into a multi stage, don't forget to indend everything:
+Transform the pool into a multi stage, don't forget to indent everything else in the yaml file:
 
 ```yml
 stages:
