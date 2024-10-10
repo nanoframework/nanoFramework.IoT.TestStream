@@ -178,11 +178,10 @@ The application will bind and attach the devices into WSL, run the docker contai
 > [!Important]
 > In the current state of the application, no restart will be provided in case the container stops or WSL stops.
 
+## Maintainer documentation
+
+Please [check this page](./maintainer.md) for maintainer documentation and details.
+
 ## Missing elements
 
-[x] Documentation in this page to build the docker file for the agent. Or possibly add this as an option in the TestRunner.
 [ ] Create a robust error handling to restart the container, WSL or any other element when needed.
-[x] Add an option to create a task out of the runner to run in the background.
-[x] Package the agent dockerfile, scripts into the application so that, it can be installed easily from a nuget.
-[ ] Package the TestStream.Runner application as a nuget/dotnet tool for easy installation.
-[x] Add ability to log into environement on top of the console.
