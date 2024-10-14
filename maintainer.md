@@ -98,7 +98,7 @@ Add then this block at the very end, it will create multi stages that depends on
 
 ```yml
 - ${{ each appComponents in parameters.appComponents }}:   
-  - template: azure-pipelines-templates/device-test.yml
+  - template: azure-pipelines-templates/device-test.yml@templates
     parameters:
       appComponents: ${{ appComponents }}
       unitTestRunsettings: 
