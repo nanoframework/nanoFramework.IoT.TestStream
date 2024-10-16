@@ -240,7 +240,7 @@ stages:
 
                 # Loop to retry the function call
                 while ($attempt -lt $MAX_RETRIES) {
-                    $RESULT_TEST = & "vstest.console.exe" "$BASE_DIR\${{ split(tests, ',')[1] }}" /Settings:"$BASE_DIR\${{ split(tests, ',')[0]}}" /TestAdapterPath:"$TESTADAPTER_PATH" /Logger:trx
+                    $RESULT_TEST = & "C:\agent\_work\_tool\VsTest\17.11.1\x64\tools\net462\Common7\IDE\Extensions\TestPlatform\vstest.console.exe" "$BASE_DIR\${{ split(tests, ',')[1] }}" /Settings:"$BASE_DIR\${{ split(tests, ',')[0]}}" /TestAdapterPath:"$TESTADAPTER_PATH" /Logger:trx
                     Write-Output "$RESULT_TEST"
                     if ($RESULT_TEST -match "Couldn't connect to the device" -or $RESULT_TEST -match "Couldn't find any valid nanoDevice") {
                         Write-Output "Test failed. Retrying in $DELAY seconds..."
