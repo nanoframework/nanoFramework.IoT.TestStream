@@ -218,7 +218,7 @@ stages:
             
             - task: VisualStudioTestPlatformInstaller@1
               condition: eq(variables['Agent.OS'], 'Windows_NT')
-              displayName: 'Visual Studio Test Platform Installer'
+              displayName: 'Windows Visual Studio Test Platform Installer'
               inputs:
                 versionSelector: latestStable
 
@@ -281,7 +281,7 @@ stages:
 
                 # Optional: Print a message indicating completion
                 echo "All .trx files have been removed from $unitTestRunsettings"
-              displayName: Cleaning tests results
+              displayName: Linux Cleaning tests results
               condition: eq(variables['Agent.OS'], 'Linux')
 
             - powershell: |
@@ -295,5 +295,5 @@ stages:
 
                 # Optional: Print a message indicating completion
                 Write-Output "All .trx files have been removed from $UNIT_TEST_RUNSETTINGS_DIR\TestResults"
-              displayName: 'Cleaning tests results'
+              displayName: 'Windows Cleaning tests results'
               condition: eq(variables['Agent.OS'], 'Windows_NT')
