@@ -30,7 +30,7 @@ stages:
 
     jobs:
       - job:
-        condition: agent.os -equals Linux
+        condition: eq(variables['Agent.OS'], 'Linux')
         displayName: 'Test job for ${{ parameters.appComponents }}'
 
         steps:          
@@ -157,7 +157,7 @@ stages:
               displayName: Cleaning tests results
 
       - job:
-        condition: agent.os -equals Windows_NT
+        condition: eq(variables['Agent.OS'], 'Windows_NT')
         displayName: 'Test job for ${{ parameters.appComponents }}'
 
         steps:          
