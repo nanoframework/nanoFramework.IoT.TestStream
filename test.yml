@@ -29,8 +29,7 @@ stages:
         - ${{ parameters.appComponents }}
 
     jobs:
-      - job:
-        condition: eq(variables['Agent.OS'], 'Linux')
+      - job:        
         displayName: 'Test job for ${{ parameters.appComponents }}'
 
         steps:          
@@ -41,10 +40,19 @@ stages:
 
           - task: DotNetCoreCLI@2
             displayName: 'Install nanoff'
+            condition: eq(variables['Agent.OS'], 'Linux')
             inputs:
               command: custom
               custom: tool
               arguments: 'install nanoff --tool-path /azp/tools'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Install nanoff'
+            condition: eq(variables['Agent.OS'], 'Windows_NT')
+            inputs:
+              command: custom
+              custom: tool
+              arguments: 'install nanoff --tool-path $(Agent.HomeDirectory)\tools'
 
           - ${{ each tests in parameters.unitTestRunsettings }}:
             - bash: |
@@ -83,6 +91,51 @@ stages:
                     exit 1
                 fi
               displayName: 'Flash device'
+              condition: eq(variables['Agent.OS'], 'Linux')
+              retryCountOnTaskFailure: 3
+
+            - powershell: |
+                # Read the configuration.json file
+                $configPath = "$(Agent.HomeDirectory)\configuration.json"
+                $configJson = Get-Content -Raw -Path $configPath | ConvertFrom-Json
+
+                # Get the SerialPort value for the specified app component
+                $appComponent = '${{ parameters.appComponents }}'
+                $SerialPort = $configJson.capabilities.$appComponent
+
+                # Maximum number of retries
+                $MAX_RETRIES = ${{ parameters.MaxRetries }}
+                # Delay between retries in seconds
+                $DELAY = 2
+                # Initialize the counter
+                $attempt = 0
+                # Baud rates to try
+                $BAUD_RATES = @(1500000, 1000000, 500000, 250000, 150000)
+                # Initialize baud rate index
+                $baud_index = 0
+
+                # Loop to retry the function call
+                while ($attempt -lt $MAX_RETRIES) {
+                  nanoff --target $appComponent --update --masserase --serialport $SerialPort --baud $BAUD_RATES[$baud_index]
+                  $status = $LASTEXITCODE
+                  if ($status -eq 0) {
+                      break
+                  } else {
+                      $attempt++
+                      $baud_index++
+                      if ($baud_index -ge $BAUD_RATES.Length) {
+                          $baud_index = 0 # reset index to the minimum speed
+                      }
+                      Start-Sleep -Seconds $DELAY
+                  }
+                }
+
+                if ($attempt -eq $MAX_RETRIES) {
+                    Write-Host "Flashing failed after $MAX_RETRIES attempts."
+                    exit 1
+                }
+              displayName: 'Flash device'
+              condition: eq(variables['Agent.OS'], 'Windows_NT')
               retryCountOnTaskFailure: 3
 
             - bash: |
@@ -95,6 +148,7 @@ stages:
                 cat $(System.DefaultWorkingDirectory)/Artifacts/${{ split(tests, ',')[0]}}
                 exit $?
               displayName: 'Update nano.runsettings'
+              condition: eq(variables['Agent.OS'], 'Linux')
 
             - bash: |
                 # Maximum number of retries
@@ -137,6 +191,7 @@ stages:
               displayName: 'Run tests'
               timeoutInMinutes: 120
               retryCountOnTaskFailure: 3
+              condition: eq(variables['Agent.OS'], 'Linux')
             
             - task: PublishTestResults@2
               inputs:
@@ -155,64 +210,4 @@ stages:
                 # Optional: Print a message indicating completion
                 echo "All .trx files have been removed from $unitTestRunsettings"
               displayName: Cleaning tests results
-
-      - job:
-        condition: eq(variables['Agent.OS'], 'Windows_NT')
-        displayName: 'Test job for ${{ parameters.appComponents }}'
-
-        steps:          
-          - task: DownloadPipelineArtifact@2
-            displayName: 'Download Pipeline Artifact'
-            inputs:
-              path: '$(System.DefaultWorkingDirectory)'
-
-          - task: DotNetCoreCLI@2
-            displayName: 'Install nanoff'
-            inputs:
-              command: custom
-              custom: tool
-              arguments: 'install nanoff --tool-path $(Agent.HomeDirectory)\tools'
-          
-          - ${{ each tests in parameters.unitTestRunsettings }}:
-            - powershell: |
-                # Read the configuration.json file
-                $configPath = "$(Agent.HomeDirectory)\configuration.json"
-                $configJson = Get-Content -Raw -Path $configPath | ConvertFrom-Json
-
-                # Get the SerialPort value for the specified app component
-                $appComponent = '${{ parameters.appComponents }}'
-                $SerialPort = $configJson.capabilities.$appComponent
-
-                # Maximum number of retries
-                $MAX_RETRIES = ${{ parameters.MaxRetries }}
-                # Delay between retries in seconds
-                $DELAY = 2
-                # Initialize the counter
-                $attempt = 0
-                # Baud rates to try
-                $BAUD_RATES = @(1500000, 1000000, 500000, 250000, 150000)
-                # Initialize baud rate index
-                $baud_index = 0
-
-                # Loop to retry the function call
-                while ($attempt -lt $MAX_RETRIES) {
-                  nanoff --target $appComponent --update --masserase --serialport $SerialPort --baud $BAUD_RATES[$baud_index]
-                  $status = $LASTEXITCODE
-                  if ($status -eq 0) {
-                      break
-                  } else {
-                      $attempt++
-                      $baud_index++
-                      if ($baud_index -ge $BAUD_RATES.Length) {
-                          $baud_index = 0 # reset index to the minimum speed
-                      }
-                      Start-Sleep -Seconds $DELAY
-                  }
-                }
-
-                if ($attempt -eq $MAX_RETRIES) {
-                    Write-Host "Flashing failed after $MAX_RETRIES attempts."
-                    exit 1
-                }
-              displayName: 'Flash device'
-              retryCountOnTaskFailure: 3
+              condition: eq(variables['Agent.OS'], 'Linux')
