@@ -39,6 +39,7 @@ parameters:
   default:
     - XIAO_ESP32C3
     - ESP32_C3_REV3
+    - ESP32_REV0
 
 stages:
 - stage: Build
