@@ -4,7 +4,13 @@ Follow the instruction that will looks like this:
 
 ![instructions](./docs/native-setup.png)
 
-You will be prompted for:
+By default, the agent will advertise almost all your environement variables including the name of the user, some key directories, and many many other elements. You can get rid of this by setting up the VSO_AGENT_IGNORE environement variable. Run the script with this specific setup to create this environement variable **before** you setup the configuration.
+
+```powershell
+.\capacities.ps1 -IgnoreAllEnv $True -SkipCapabilities $true
+```
+
+Then, you can run the `.\config.cmd` where you will be prompted for:
 
 * the serveur URL: `https://dev.azure.com/nanoframework`
 * the authentication, use the default PAT
