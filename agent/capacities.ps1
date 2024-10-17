@@ -1,3 +1,22 @@
+param (
+    [bool]$IgnoreAllEnv = $false,
+    [bool]$SkipCapabilities = $false
+)
+
+if ($IgnoreAllEnv) {
+    # Concatenate all environment variable names into a single string separated by commas
+    $envVars = Get-ChildItem Env:
+    $concatenatedNames = ($envVars | ForEach-Object { $_.Name }) -join ','
+
+    # Set the concatenated string to the VSO_AGENT_IGNORE environment variable
+    $env:VSO_AGENT_IGNORE = $concatenatedNames
+}
+
+if($SkipCapabilities)
+{
+    exit
+}
+
 # Check if AZP_TOKEN_FILE is not set
 if (-not $env:AZP_TOKEN_FILE) {
     # Check if AZP_TOKEN is not set
@@ -37,4 +56,5 @@ $AZP_POOL_AGENTS = Invoke-RestMethod -Uri "$serverUrl/_apis/distributedtask/pool
 Write-Output "Capabilities set: $capabilities"
 
 # Remove the token file
+Remove-Item -Path $env:AZP_TOKEN_FILE
 Remove-Item -Path Env:AZP_TOKEN_FILE
