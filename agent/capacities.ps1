@@ -18,13 +18,14 @@ Remove-Item -Path Env:AZP_TOKEN
 $agentConfig = Get-Content -Raw -Path ".agent" | ConvertFrom-Json
 $serverUrl = $agentConfig.serverUrl
 $poolName = $agentConfig.poolName
+$agentName = $agentConfig.agentName
 
 # setting up the capabilities
 $AZP_POOL_AGENTS = Invoke-RestMethod -Uri "$serverUrl/_apis/distributedtask/pools?poolName=$poolName&api-version=7.2-preview.1" -Headers @{Authorization=("Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("user:" + (Get-Content -Path $env:AZP_TOKEN_FILE))))} -Method Get
 $AZP_POOL_ID = $AZP_POOL_AGENTS.value[0].id
 
 # URL encode the AZP_AGENT_NAME environment variable
-$encoded_name = [System.Web.HttpUtility]::UrlEncode($env:AZP_AGENT_NAME)
+$encoded_name = [System.Web.HttpUtility]::UrlEncode($agentName)
 
 # Print the encoded name
 $AZP_POOL_AGENTS = Invoke-RestMethod -Uri "$serverUrl/_apis/distributedtask/pools/$AZP_POOL_ID/agents?agentName=$encoded_name&api-version=7.2-preview.1" -Headers @{Authorization=("Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("user:" + (Get-Content -Path $env:AZP_TOKEN_FILE))))} -Method Get
@@ -36,4 +37,4 @@ $AZP_POOL_AGENTS = Invoke-RestMethod -Uri "$serverUrl/_apis/distributedtask/pool
 Write-Output "Capabilities set: $capabilities"
 
 # Remove the token file
-Remove-Item -Path $env:AZP_TOKEN_FILE
+Remove-Item -Path Env:AZP_TOKEN_FILE
