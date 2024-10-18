@@ -27,29 +27,88 @@ jobs:
         AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
         AZURE_DEVOPS_PIPELINE_ID: 111
         AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
+        AZURE_POOL_NAME: TestStream
       run: |
-        # Define the parameters
-        parameters=$(jq -n --argjson appComponents '["XIAO_ESP32C3", "ESP32_C3_REV3", "ESP32_REV0"]' '{parameters: {appComponents: $appComponents}}')
-
-        # Define the request body
-        body=$(jq -n --argjson parameters "$parameters" '{resources: {repositories: [{repository: "templates", type: "github", name: "nanoframework/nf-tools", endpoint: "nanoframework"}]}, parameters: $parameters.parameters}')
-
+        pwsh -Command "
+        
         # Define the Azure DevOps organization, project, and pipeline
-        organization=$AZURE_DEVOPS_ORG
-        project=$AZURE_DEVOPS_PROJECT
-        pipelineId=$AZURE_DEVOPS_PIPELINE_ID
+        $organization = '${{ env.AZURE_DEVOPS_ORG }}'
+        $project = '${{ env.AZURE_DEVOPS_PROJECT }}'
+        $pipelineId = '${{ env.AZURE_DEVOPS_PIPELINE_ID }}'
+        $poolName = '${{ env.AZURE_POOL_NAME }}'
 
         # Define the personal access token (PAT)
-        pat=$AZURE_DEVOPS_PAT
+        $pat = '${{ secrets.AZURE_DEVOPS_PAT }}'
 
         # Encode the PAT
-        patEncoded=$(echo -n ":$pat" | base64)
+        $patEncoded = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("user:" + $($pat)))
 
         # Define the headers
-        headers="Authorization: Basic $patEncoded\nContent-Type: application/json"
+        $headers = @{
+            Authorization = 'Basic ' + $patEncoded
+            'Content-Type' = 'application/json'
+        }
+        
+        $url = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools?poolName=' + $poolName + '&api-version=7.2-preview.1'
+        $AZP_POOL_AGENTS = Invoke-RestMethod -Uri $url -Headers @{Authorization=("Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("user:" + $($pat))))} -Method Get
+        $poolId = $AZP_POOL_AGENTS.value[0].id
+
+        # Define the URL to get all agents in the pool
+        $url = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools/' + $poolId + '/agents?api-version=6.0-preview.1'
+
+        # Get all agents
+        $response = Invoke-RestMethod -Uri $url -Method Get -Headers $headers
+
+        # Collect IDs of active and online agents
+        $agentIds = $response.value | Where-Object { $_.status -eq 'online' -and $_.enabled -eq $true } | ForEach-Object { $_.id }
+
+        # Get the capabilities of each agent
+        $agentCapabilities = @()
+        foreach ($agentId in $agentIds) {
+            $capabilitiesUrl = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools/' + $poolId + '/agents/' + $agentId + '?includeCapabilities=true&api-version=6.0-preview.1'
+            $agentResponse = Invoke-RestMethod -Uri $capabilitiesUrl -Method Get -Headers $headers
+
+            # Extract the keys (names) of userCapabilities
+            $capabilityNames = $agentResponse.userCapabilities.PSObject.Properties.Name
+    
+            # Iterate over each item in capacityNames
+            foreach ($item in $capabilityNames) {
+                # Check if the item is already in agentCapabilities
+                if (-not ($agentCapabilities -contains $item)) {
+                    # Add the item to agentCapabilities
+                    $agentCapabilities += $item
+                }
+            }
+        }
+        
+        $parameters = @{
+            appComponents = $agentCapabilities
+        }
+
+        # Convert parameters to JSON
+        $parametersJson = $parameters | ConvertTo-Json
+
+        # Define the request body
+        $body = @{
+            resources = @{
+                repositories = @(
+                    @{
+                        repository = 'templates'
+                        type = 'github'
+                        name = 'nanoframework/nf-tools'
+                        endpoint = 'nanoframework'
+                    }
+                )
+            }
+            parameters = $parametersJson
+        }
+
+        # Convert the body to JSON
+        $bodyJson = $body | ConvertTo-Json
 
         # Define the URL
-        url="https://dev.azure.com/$organization/$project/_apis/pipelines/$pipelineId/runs?api-version=6.0-preview.1"
+        $url = 'https://dev.azure.com/' + $organization + '/' + $project + '/_apis/pipelines/' + $pipelineId + '/runs?api-version=6.0-preview.1'
 
         # Trigger the pipeline
-        curl -X POST -H "$headers" -d "$body" "$url"
+        Invoke-RestMethod -Uri $url -Method Post -Headers $headers -Body $bodyJson
+        "
