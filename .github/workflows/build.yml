@@ -20,3 +20,36 @@ jobs:
 
     - name: Build the project
       run: dotnet build TestStream.Runner/TestStream.Runner.csproj
+    
+    - name: Trigger Azure DevOps Pipeline
+      env:
+        AZURE_DEVOPS_ORG: nanoframework
+        AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
+        AZURE_DEVOPS_PIPELINE_ID: 111
+        AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
+      run: |
+        # Define the parameters
+        parameters=$(jq -n --argjson appComponents '["XIAO_ESP32C3", "ESP32_C3_REV3", "ESP32_REV0"]' '{parameters: {appComponents: $appComponents}}')
+
+        # Define the request body
+        body=$(jq -n --argjson parameters "$parameters" '{resources: {repositories: [{repository: "templates", type: "github", name: "nanoframework/nf-tools", endpoint: "nanoframework"}]}, parameters: $parameters.parameters}')
+
+        # Define the Azure DevOps organization, project, and pipeline
+        organization=$AZURE_DEVOPS_ORG
+        project=$AZURE_DEVOPS_PROJECT
+        pipelineId=$AZURE_DEVOPS_PIPELINE_ID
+
+        # Define the personal access token (PAT)
+        pat=$AZURE_DEVOPS_PAT
+
+        # Encode the PAT
+        patEncoded=$(echo -n ":$pat" | base64)
+
+        # Define the headers
+        headers="Authorization: Basic $patEncoded\nContent-Type: application/json"
+
+        # Define the URL
+        url="https://dev.azure.com/$organization/$project/_apis/pipelines/$pipelineId/runs?api-version=6.0-preview.1"
+
+        # Trigger the pipeline
+        curl -X POST -H "$headers" -d "$body" "$url"
