@@ -50,7 +50,7 @@ jobs:
         }
         
         $url = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools?poolName=' + $poolName + '&api-version=7.2-preview.1'
-        $AZP_POOL_AGENTS = Invoke-RestMethod -Uri $url -Headers @{Authorization=('Basic ' + $($patEncoded)} -Method Get
+        $AZP_POOL_AGENTS = Invoke-RestMethod -Uri $url -Headers @{Authorization=('Basic ' + $($patEncoded))} -Method Get
         $poolId = $AZP_POOL_AGENTS.value[0].id
 
         # Define the URL to get all agents in the pool
