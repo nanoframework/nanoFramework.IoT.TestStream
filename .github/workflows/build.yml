@@ -37,11 +37,8 @@ jobs:
         $pipelineId = '${{ env.AZURE_DEVOPS_PIPELINE_ID }}'
         $poolName = '${{ env.AZURE_POOL_NAME }}'
 
-        # Define the personal access token (PAT)
-        $pat = '${{ secrets.AZURE_DEVOPS_PAT }}'
-
         # Encode the PAT
-        $patEncoded = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes('user:' + $($pat)))
+        $patEncoded = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes('user:${{ secrets.AZURE_DEVOPS_PAT }}'))
 
         # Define the headers
         $headers = @{
