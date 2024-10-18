@@ -20,3 +20,81 @@ jobs:
 
     - name: Build the project
       run: dotnet build TestStream.Runner/TestStream.Runner.csproj
+    
+    - name: Trigger Azure DevOps Pipeline
+      env:
+        AZURE_DEVOPS_ORG: nanoframework
+        AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
+        AZURE_DEVOPS_PIPELINE_ID: 111
+        AZURE_POOL_NAME: TestStream
+      run: |
+        # Define the Azure DevOps organization, project, and pipeline
+        organization="${AZURE_DEVOPS_ORG}"
+        project="${AZURE_DEVOPS_PROJECT}"
+        pipelineId="${AZURE_DEVOPS_PIPELINE_ID}"
+        poolName="${AZURE_POOL_NAME}"
+
+        # Encode the PAT
+        patEncoded=$(echo -n ":${{ secrets.AZURE_DEVOPS_PAT }}" | base64)
+
+        # Define the headers
+        headers=(
+          -H "Authorization: Basic $patEncoded"
+          -H "Content-Type: application/json"
+        )
+
+        # Get the pool ID
+        url="https://dev.azure.com/${organization}/_apis/distributedtask/pools?poolName=${poolName}&api-version=7.1"
+        AZP_POOL_AGENTS=$(curl -s "${headers[@]}" -X GET "$url")
+        poolId=$(echo "$AZP_POOL_AGENTS" | jq -r '.value[0].id')
+
+        # Define the URL to get all agents in the pool
+        url="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents?api-version=7.1"
+
+        # Get all agents
+        response=$(curl -s "${headers[@]}" -X GET "$url")
+
+        # Collect IDs of active and online agents
+        agentIds=$(echo "$response" | jq -r '.value[] | select(.status == "online" and .enabled == true) | .id')
+
+        # Get the capabilities of each agent
+        for agentId in $agentIds; do
+          capabilitiesUrl="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents/${agentId}?includeCapabilities=true&api-version=7.1"
+          agentResponse=$(curl -s "${headers[@]}" -X GET "$capabilitiesUrl")
+
+          # Extract the keys (names) of userCapabilities
+          capabilityNames=$(echo "$agentResponse" | jq -r '.userCapabilities | keys[]')
+        done
+
+        # Get the capabilities of each agent
+        for agentId in $agentIds; do
+          capabilitiesUrl="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents/${agentId}?includeCapabilities=true&api-version=7.1"
+          agentResponse=$(curl -s "${headers[@]}" -X GET "$capabilitiesUrl")
+
+          # Extract the keys (names) of userCapabilities
+          capabilityNames=$(echo "$agentResponse" | jq -r '.userCapabilities | keys[]')
+        done
+
+        # Prepare the parameters
+        parametersJson=$(jq -n --argjson appComponents "$agentCapabilities" '{appComponents: $appComponents}')
+
+        # Define the request body
+        bodyJson=$(jq -n --argjson parameters "$parametersJson" '{
+          resources: {
+            repositories: [
+              {
+                repository: "templates",
+                type: "github",
+                name: "nanoframework/nf-tools",
+                endpoint: "nanoframework"
+              }
+            ]
+          },
+          parameters: $parameters
+        }')
+
+        # Define the URL
+        url="https://dev.azure.com/${organization}/${project}/_apis/pipelines/${pipelineId}/runs?api-version=7.1"
+
+        # Trigger the pipeline
+        curl -s "${headers[@]}" -X POST -d "$bodyJson" "$url"
