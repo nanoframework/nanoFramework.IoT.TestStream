@@ -49,12 +49,12 @@ jobs:
             'Content-Type' = 'application/json'
         }
         
-        $url = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools?poolName=' + $poolName + '&api-version=7.2-preview.1'
-        $AZP_POOL_AGENTS = Invoke-RestMethod -Uri $url -Headers @{Authorization=('Basic ' + $($patEncoded))} -Method Get
+        $url = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools?poolName=' + $poolName + '&api-version=7.1'
+        $AZP_POOL_AGENTS = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
         $poolId = $AZP_POOL_AGENTS.value[0].id
 
         # Define the URL to get all agents in the pool
-        $url = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools/' + $poolId + '/agents?api-version=6.0-preview.1'
+        $url = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools/' + $poolId + '/agents?api-version=7.1'
 
         # Get all agents
         $response = Invoke-RestMethod -Uri $url -Method Get -Headers $headers
@@ -65,7 +65,7 @@ jobs:
         # Get the capabilities of each agent
         $agentCapabilities = @()
         foreach ($agentId in $agentIds) {
-            $capabilitiesUrl = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools/' + $poolId + '/agents/' + $agentId + '?includeCapabilities=true&api-version=6.0-preview.1'
+            $capabilitiesUrl = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools/' + $poolId + '/agents/' + $agentId + '?includeCapabilities=true&api-version=7.1'
             $agentResponse = Invoke-RestMethod -Uri $capabilitiesUrl -Method Get -Headers $headers
 
             # Extract the keys (names) of userCapabilities
@@ -107,7 +107,7 @@ jobs:
         $bodyJson = $body | ConvertTo-Json
 
         # Define the URL
-        $url = 'https://dev.azure.com/' + $organization + '/' + $project + '/_apis/pipelines/' + $pipelineId + '/runs?api-version=6.0-preview.1'
+        $url = 'https://dev.azure.com/' + $organization + '/' + $project + '/_apis/pipelines/' + $pipelineId + '/runs?api-version=7.1'
 
         # Trigger the pipeline
         Invoke-RestMethod -Uri $url -Method Post -Headers $headers -Body $bodyJson
