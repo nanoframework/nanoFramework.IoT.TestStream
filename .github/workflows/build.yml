@@ -26,24 +26,28 @@ jobs:
         AZURE_DEVOPS_ORG: nanoframework
         AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
         AZURE_DEVOPS_PIPELINE_ID: 111
-        AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
         AZURE_POOL_NAME: TestStream
       run: |
         pwsh -Command "
-        
-        # Define the Azure DevOps organization, project, and pipeline
-        $organization = '${{ env.AZURE_DEVOPS_ORG }}'
-        $project = '${{ env.AZURE_DEVOPS_PROJECT }}'
-        $pipelineId = '${{ env.AZURE_DEVOPS_PIPELINE_ID }}'
-        $poolName = '${{ env.AZURE_POOL_NAME }}'
+        try {
+          # Define the Azure DevOps organization, project, and pipeline
+          $organization = '${{ env.AZURE_DEVOPS_ORG }}'
+          $project = '${{ env.AZURE_DEVOPS_PROJECT }}'
+          $pipelineId = '${{ env.AZURE_DEVOPS_PIPELINE_ID }}'
+          $poolName = '${{ env.AZURE_POOL_NAME }}'
 
-        # Encode the PAT
-        $patEncoded = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes('user:${{ secrets.AZURE_DEVOPS_PAT }}'))
+          # Encode the PAT
+          $patEncoded = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes('user:${{ secrets.AZURE_DEVOPS_PAT }}'))
 
-        # Define the headers
-        $headers = @{
-            Authorization = 'Basic ' + $patEncoded
-            'Content-Type' = 'application/json'
+          # Define the headers
+          $headers = @{
+              Authorization = 'Basic ' + $patEncoded
+              'Content-Type' = 'application/json'
+          }
+        Write-Host "Azure DevOps configuration initialized successfully"
+        } catch {
+            Write-Error "Failed to initialize Azure DevOps configuration: $_"
+            exit 1
         }
         
         $url = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools?poolName=' + $poolName + '&api-version=7.1'
@@ -51,33 +55,22 @@ jobs:
         $poolId = $AZP_POOL_AGENTS.value[0].id
 
         # Define the URL to get all agents in the pool
-        $url = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools/' + $poolId + '/agents?api-version=7.1'
+        $url = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools/' + $poolId + '/agents?includeCapabilities=true&api-version=7.1'
 
-        # Get all agents
-        $response = Invoke-RestMethod -Uri $url -Method Get -Headers $headers
-
-        # Collect IDs of active and online agents
-        $agentIds = $response.value | Where-Object { $_.status -eq 'online' -and $_.enabled -eq $true } | ForEach-Object { $_.id }
-
-        # Get the capabilities of each agent
-        $agentCapabilities = @()
-        foreach ($agentId in $agentIds) {
-            $capabilitiesUrl = 'https://dev.azure.com/' + $organization + '/_apis/distributedtask/pools/' + $poolId + '/agents/' + $agentId + '?includeCapabilities=true&api-version=7.1'
-            $agentResponse = Invoke-RestMethod -Uri $capabilitiesUrl -Method Get -Headers $headers
-
-            # Extract the keys (names) of userCapabilities
-            $capabilityNames = $agentResponse.userCapabilities.PSObject.Properties.Name
-    
-            # Iterate over each item in capacityNames
-            foreach ($item in $capabilityNames) {
-                # Check if the item is already in agentCapabilities
-                if (-not ($agentCapabilities -contains $item)) {
-                    # Add the item to agentCapabilities
-                    $agentCapabilities += $item
-                }
-            }
+        try {
+          # Get all agents
+          $response = Invoke-RestMethod -Uri $url -Method Get -Headers $headers
+        Write-Host "Successfully retrieved agents from pool $poolId"
+        } catch {
+            Write-Error "Failed to retrieve agents: $_"
+            exit 1
         }
-        
+
+        $agentCapabilities = $response.value | 
+          Where-Object { $_.status -eq 'online' -and $_.enabled -eq $true } |
+          ForEach-Object { $_.userCapabilities.PSObject.Properties.Name } |
+          Select-Object -Unique       
+
         $parameters = @{
             appComponents = $agentCapabilities
         }
