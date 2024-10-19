@@ -28,6 +28,14 @@ jobs:
         AZURE_DEVOPS_PIPELINE_ID: 111
         AZURE_POOL_NAME: TestStream
       run: |
+        # Validate required environment variables
+        for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME; do
+            if [ -z "${!var}" ]; then
+                echo "Error: Required environment variable $var is not set"
+                exit 1
+            fi
+        done
+
         # Define the Azure DevOps organization, project, and pipeline
         organization="${AZURE_DEVOPS_ORG}"
         project="${AZURE_DEVOPS_PROJECT}"
@@ -53,11 +61,18 @@ jobs:
         # Define the URL to get all agents in the pool
         url="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents?includeCapabilities=true&api-version=7.1"
 
-        response=$(curl -s "${headers[@]}" -X GET "$url")
+        response=$(curl -s -w "%{http_code}" "${headers[@]}" -X GET "$url")
+        http_code=${response: -3}
+        content=${response::-3}
 
-        # Extract all userCapabilities names for online and enabled agents as a unique list
-        capabilityNames=$(echo "$response" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys] | unique')
-
+        if [ $http_code -eq 200 ]; then
+            # Extract all userCapabilities names for online and enabled agents as a unique list
+            capabilityNames=$(echo "$response" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys] | unique')
+        else
+            echo "Failed to retrieve agent capabilities. HTTP Status Code: $http_code"
+            echo "Response: $content"
+            exit 1
+        fi
         echo "Unique userCapabilities names: $capabilityNames"
 
         # Prepare the parameters
@@ -84,4 +99,15 @@ jobs:
         url="https://dev.azure.com/${organization}/${project}/_apis/pipelines/${pipelineId}/runs?api-version=7.1"
 
         # Trigger the pipeline
-        curl -s "${headers[@]}" -X POST -d "$bodyJson" "$url"
+        response=$(curl -s -w "%{http_code}" "${headers[@]}" -X POST -d "$bodyJson" "$url")
+        http_code=${response: -3}
+        content=${response::-3}
+
+        if [ $http_code -eq 200 ]; then
+            run_id=$(echo "$content" | jq -r '.id')
+            echo "Pipeline triggered successfully. Run ID: $run_id"
+        else
+            echo "Failed to trigger pipeline. HTTP Status Code: $http_code"
+            echo "Response: $content"
+            exit 1
+        fi

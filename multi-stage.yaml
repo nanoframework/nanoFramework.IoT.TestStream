@@ -21,6 +21,8 @@
 # pr:
 #   autoCancel: true
 
+trigger: none
+
 # add nf-tools repo to resources (for Azure Pipelines templates)
 resources:
   repositories:
