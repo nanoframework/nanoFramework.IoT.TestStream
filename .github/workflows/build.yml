@@ -49,33 +49,14 @@ jobs:
         poolId=$(echo "$AZP_POOL_AGENTS" | jq -r '.value[0].id')
 
         echo "Pool ID: $poolId"
-        
+
         # Define the URL to get all agents in the pool
-        url="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents?api-version=7.1"
+        url="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents?includeCapabilities=true&api-version=7.1"
 
-        # Get all agents
-        response=$(curl -s "${headers[@]}" -X GET "$url")
+        # Extract all userCapabilities names for online and enabled agents as a unique list
+        capabilityNames=$(echo "$response" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys[]] | unique | .[]')
 
-        # Collect IDs of active and online agents
-        agentIds=$(echo "$response" | jq -r '.value[] | select(.status == "online" and .enabled == true) | .id')
-
-        # Get the capabilities of each agent
-        for agentId in $agentIds; do
-          capabilitiesUrl="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents/${agentId}?includeCapabilities=true&api-version=7.1"
-          agentResponse=$(curl -s "${headers[@]}" -X GET "$capabilitiesUrl")
-
-          # Extract the keys (names) of userCapabilities
-          capabilityNames=$(echo "$agentResponse" | jq -r '.userCapabilities | keys[]')
-        done
-
-        # Get the capabilities of each agent
-        for agentId in $agentIds; do
-          capabilitiesUrl="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents/${agentId}?includeCapabilities=true&api-version=7.1"
-          agentResponse=$(curl -s "${headers[@]}" -X GET "$capabilitiesUrl")
-
-          # Extract the keys (names) of userCapabilities
-          capabilityNames=$(echo "$agentResponse" | jq -r '.userCapabilities | keys[]')
-        done
+        echo "Unique userCapabilities names: $capabilityNames"
 
         # Prepare the parameters
         parametersJson=$(jq -n --argjson appComponents "$agentCapabilities" '{appComponents: $appComponents}')
