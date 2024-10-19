@@ -53,6 +53,8 @@ jobs:
         # Define the URL to get all agents in the pool
         url="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents?includeCapabilities=true&api-version=7.1"
 
+        response=$(curl -s "${headers[@]}" -X GET "$url")
+
         # Extract all userCapabilities names for online and enabled agents as a unique list
         capabilityNames=$(echo "$response" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys[]] | unique | .[]')
 
