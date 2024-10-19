@@ -56,12 +56,14 @@ jobs:
         response=$(curl -s "${headers[@]}" -X GET "$url")
 
         # Extract all userCapabilities names for online and enabled agents as a unique list
-        capabilityNames=$(echo "$response" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys[]] | unique | .[]')
+        capabilityNames=$(echo "$response" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys] | unique')
 
         echo "Unique userCapabilities names: $capabilityNames"
 
         # Prepare the parameters
-        parametersJson=$(jq -n --argjson appComponents "$agentCapabilities" '{appComponents: $appComponents}')
+        parametersJson=$(jq -n --argjson appComponents "$capabilityNames" '{appComponents: $appComponents}')
+
+        echo "Parameters: $parametersJson"
 
         # Define the request body
         bodyJson=$(jq -n --argjson parameters "$parametersJson" '{
