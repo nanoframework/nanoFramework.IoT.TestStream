@@ -67,7 +67,7 @@ jobs:
 
         if [ $http_code -eq 200 ]; then
             # Extract all userCapabilities names for online and enabled agents as a unique list
-            capabilityNames=$(echo "$response" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys] | unique')
+            capabilityNames=$(echo "$content" | jq -r '.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys[]' | sort -u)
         else
             echo "Failed to retrieve agent capabilities. HTTP Status Code: $http_code"
             echo "Response: $content"
