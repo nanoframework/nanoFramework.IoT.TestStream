@@ -22,12 +22,11 @@ jobs:
       run: dotnet build TestStream.Runner/TestStream.Runner.csproj
     
     - name: Trigger Azure DevOps Pipeline
-      env:
-        # commenting before removing if global variables is working
-        # AZURE_DEVOPS_ORG: nanoframework
+      env:        
+        AZURE_DEVOPS_ORG: ${{ env.AZURE_DEVOPS_ORG }}
         AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
         AZURE_DEVOPS_PIPELINE_ID: 111
-        # AZURE_POOL_NAME: TestStream
+        AZURE_POOL_NAME: ${{ env.AZURE_POOL_NAME }}
       run: |
         # Validate required environment variables
         for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME; do
