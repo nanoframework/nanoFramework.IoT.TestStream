@@ -92,17 +92,11 @@ jobs:
                 type: "github",
                 name: "nanoframework/nf-tools",
                 endpoint: "nanoframework"
-              },
-              {
-                repository: "nanoFramework",
-                type: "github",
-                name: "nanoframework/nanoFramework.IoT.TestStream",
-                ref: $branch,
-                endpoint: "nanoframework"
               }
             ]
           },
           parameters: $parameters,
+          ref: $branch
         }')
 
         # Define the URL
