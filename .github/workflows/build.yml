@@ -97,7 +97,7 @@ jobs:
                 repository: "nanoFramework",
                 type: "github",
                 name: "nanoframework/nanoFramework.IoT.TestStream",
-                refName: $branch,
+                ref: $branch,
                 endpoint: "nanoframework"
               }
             ]
