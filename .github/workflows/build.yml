@@ -20,3 +20,126 @@ jobs:
 
     - name: Build the project
       run: dotnet build TestStream.Runner/TestStream.Runner.csproj
+    
+    - name: Trigger Azure DevOps Pipeline
+      env:        
+        AZURE_DEVOPS_ORG: ${{ vars.AZURE_DEVOPS_ORG }}
+        AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
+        AZURE_DEVOPS_PIPELINE_ID: 111
+        AZURE_POOL_NAME: ${{ vars.AZURE_POOL_NAME }}
+        GITHUB_REF: ${{ github.ref }}
+      run: |
+        # Validate required environment variables
+        for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME GITHUB_REF; do
+            if [ -z "${!var}" ]; then
+                echo "Error: Required environment variable $var is not set"
+                exit 1
+            fi
+        done
+
+        # Define the Azure DevOps organization, project, and pipeline
+        organization="${AZURE_DEVOPS_ORG}"
+        project="${AZURE_DEVOPS_PROJECT}"
+        pipelineId="${AZURE_DEVOPS_PIPELINE_ID}"
+        poolName="${AZURE_POOL_NAME}"
+        branch="${GITHUB_REF}"
+
+        # Encode the PAT
+        patEncoded=$(echo -n ":${{ secrets.AZURE_DEVOPS_PAT }}" | base64)
+
+        # Define the headers
+        headers=(
+          -H "Authorization: Basic $patEncoded"
+          -H "Content-Type: application/json"
+        )
+
+        # Get the pool ID
+        url="https://dev.azure.com/${organization}/_apis/distributedtask/pools?poolName=${poolName}&api-version=7.1"
+        AZP_POOL_AGENTS=$(curl -s "${headers[@]}" -X GET "$url")
+        poolId=$(echo "$AZP_POOL_AGENTS" | jq -r '.value[0].id')
+
+        echo "Pool ID: $poolId"
+
+        # Define the URL to get all agents in the pool
+        url="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents?includeCapabilities=true&api-version=7.1"
+
+        response=$(curl -s -w "%{http_code}" "${headers[@]}" -X GET "$url")
+        http_code=${response: -3}
+        content=${response::-3}
+
+        if [ $http_code -eq 200 ]; then
+            # Extract all userCapabilities names for online and enabled agents as a unique list
+            capabilityNames=$(echo "$content" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys] | unique')
+        else
+            echo "Failed to retrieve agent capabilities. HTTP Status Code: $http_code"
+            echo "Response: \"$content\""
+            exit 1
+        fi
+        echo "Unique userCapabilities names: \"$capabilityNames\""
+
+        # Prepare the parameters
+        parametersJson=$(jq -n --argjson appComponents "$capabilityNames" '{appComponents: $appComponents}')
+
+        echo "Parameters: \"$parametersJson\""
+        echo "GITHUB_REF: \"$branch\""
+
+        # Define the request body
+        bodyJson=$(jq -n --argjson parameters "$parametersJson" --arg branch "$branch" '{
+          resources: {
+            repositories: [
+              {
+                repository: "templates",
+                type: "github",
+                name: "nanoframework/nf-tools",
+                endpoint: "nanoframework"
+              }
+            ]
+          },
+          parameters: $parameters,
+          ref: $branch
+        }')
+
+        # Define the URL
+        url="https://dev.azure.com/${organization}/${project}/_apis/pipelines/${pipelineId}/runs?api-version=7.1"
+
+        # Trigger the pipeline
+        response=$(curl -s -w "%{http_code}" "${headers[@]}" -X POST -d "$bodyJson" "$url")
+        http_code=${response: -3}
+        content=${response::-3}
+
+        if [ $http_code -eq 200 ]; then
+            run_id=$(echo "$content" | jq -r '.id')
+            echo "Pipeline triggered successfully. Run ID: $run_id"
+        else
+            echo "Failed to trigger pipeline. HTTP Status Code: $http_code"
+            echo "Response: $content"
+            exit 1
+        fi    
+
+        # while true; do
+        #     status_url="https://dev.azure.com/${organization}/${project}/_apis/pipelines/${pipelineId}/runs/${run_id}?api-version=7.1"
+        #     status_response=$(curl -s -w "%{http_code}" "${headers[@]}" -X GET "$status_url")
+        #     status_http_code=${status_response: -3}
+        #     status_content=${status_response::-3}
+        #     if [ $status_http_code -eq 200 ]; then
+        #         status=$(echo "$status_content" | jq -r '.status')
+        #         echo "Pipeline status: $status"
+        #         if [ "$status" == "completed" ]; then
+        #             result=$(echo "$status_content" | jq -r '.result')
+        #             echo "Pipeline result: $result"
+        #             if [ "$result" == "succeeded" ]; then
+        #                 echo "Pipeline completed successfully."
+        #                 break
+        #             else
+        #                 echo "Pipeline failed."
+        #                 exit 1
+        #             fi
+        #         fi
+        #     else
+        #         echo "Failed to check pipeline status. HTTP Status Code: $status_http_code"
+        #         echo "Response: $status_content"
+        #         exit 1
+        #     fi
+        #     # Wait for a while before checking the status again
+        #     sleep 30
+        # done        
