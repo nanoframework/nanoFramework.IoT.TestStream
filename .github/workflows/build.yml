@@ -92,6 +92,11 @@ jobs:
                 type: "github",
                 name: "nanoframework/nf-tools",
                 endpoint: "nanoframework"
+              },
+              {
+                self: {
+                  refName: $branch
+                }
               }
             ]
           },
