@@ -23,10 +23,10 @@ jobs:
     
     - name: Trigger Azure DevOps Pipeline
       env:        
-        AZURE_DEVOPS_ORG: ${{ env.AZURE_DEVOPS_ORG }}
+        AZURE_DEVOPS_ORG: ${{ vars.AZURE_DEVOPS_ORG }}
         AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
         AZURE_DEVOPS_PIPELINE_ID: 111
-        AZURE_POOL_NAME: ${{ env.AZURE_POOL_NAME }}
+        AZURE_POOL_NAME: ${{ vars.AZURE_POOL_NAME }}
       run: |
         # Validate required environment variables
         for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME; do

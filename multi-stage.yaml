@@ -18,8 +18,8 @@ parameters:
   displayName: List of capabilities to run the tests on
   type: object
   default:
-    - XIAO_ESP32C3
-  # to see if the acutal parameters are changed from actions
+  # nothing at merge
+  #  - XIAO_ESP32C3
   #  - ESP32_C3_REV3
   #  - ESP32_REV0
 
