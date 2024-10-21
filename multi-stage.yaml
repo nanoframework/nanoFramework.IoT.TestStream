@@ -18,7 +18,7 @@ parameters:
   displayName: List of capabilities to run the tests on
   type: object
   default:
-  # nothing at merge
+  # nothing at merge, just the build
   #  - XIAO_ESP32C3
   #  - ESP32_C3_REV3
   #  - ESP32_REV0
