@@ -84,7 +84,7 @@ jobs:
         echo "GITHUB_REF: \"$branch\""
 
         # Define the request body
-        bodyJson=$(jq -n --argjson parameters "$parametersJson" '{
+        bodyJson=$(jq -n --argjson parameters "$parametersJson" --arg branch "$branch" '{
           resources: {
             repositories: [
               {
