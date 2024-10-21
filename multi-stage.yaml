@@ -2,7 +2,7 @@
 # See LICENSE file in the project root for full license information.
 
 # The Pipeline is going to be called by the GitHub action.
-# Manual trigger is always possible.
+# Manual trigger is always possible and it can show up.
 # In theory, the template should not be trigger at all.
 trigger: none
 pr: none
