@@ -80,10 +80,6 @@ jobs:
 
         echo "Parameters: \"$parametersJson\""
 
-        # Get the current branch name
-        branch=$(git rev-parse --abbrev-ref HEAD)
-        echo "Current branch: $branch"
-
         # Define the request body
         bodyJson=$(jq -n --argjson parameters "$parametersJson" '{
           resources: {
@@ -97,7 +93,7 @@ jobs:
             ]
           },
           parameters: $parameters
-          ref: $branch
+          ref:  $GITHUB_REF
         }')
 
         # Define the URL
