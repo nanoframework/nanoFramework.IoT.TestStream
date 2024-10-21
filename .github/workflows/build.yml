@@ -93,7 +93,7 @@ jobs:
             ]
           },
           parameters: $parameters
-          ref:  $GITHUB_REF
+          ref: ${GITHUB_REF}
         }')
 
         # Define the URL
