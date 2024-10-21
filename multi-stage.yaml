@@ -3,6 +3,7 @@
 
 # The Pipeline is going to be called by the GitHub action.
 # Manual trigger is always possible.
+# In theory, the template should not be trigger at all
 trigger: none
 
 # add nf-tools repo to resources (for Azure Pipelines templates)
