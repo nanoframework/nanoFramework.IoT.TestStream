@@ -27,10 +27,10 @@ jobs:
         AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
         AZURE_DEVOPS_PIPELINE_ID: 111
         AZURE_POOL_NAME: ${{ vars.AZURE_POOL_NAME }}
-        GITHUB_REF: ${{ env.GITHUB_REF }}
+        GITHUB_REF: ${{ github.ref }}
       run: |
         # Validate required environment variables
-        for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME; do
+        for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME GITHUB_REF; do
             if [ -z "${!var}" ]; then
                 echo "Error: Required environment variable $var is not set"
                 exit 1
@@ -42,6 +42,7 @@ jobs:
         project="${AZURE_DEVOPS_PROJECT}"
         pipelineId="${AZURE_DEVOPS_PIPELINE_ID}"
         poolName="${AZURE_POOL_NAME}"
+        branch="${GITHUB_REF}"
 
         # Encode the PAT
         patEncoded=$(echo -n ":${{ secrets.AZURE_DEVOPS_PAT }}" | base64)
@@ -80,6 +81,7 @@ jobs:
         parametersJson=$(jq -n --argjson appComponents "$capabilityNames" '{appComponents: $appComponents}')
 
         echo "Parameters: \"$parametersJson\""
+        echo "GITHUB_REF: \"$branch\""
 
         # Define the request body
         bodyJson=$(jq -n --argjson parameters "$parametersJson" '{
@@ -94,7 +96,7 @@ jobs:
             ]
           },
           parameters: $parameters
-          ref: $GITHUB_REF
+          ref: $branch
         }')
 
         # Define the URL
