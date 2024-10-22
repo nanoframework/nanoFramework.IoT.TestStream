@@ -86,13 +86,7 @@ jobs:
         # Define the request body
         bodyJson=$(jq -n --argjson parameters "$parametersJson" --arg branch "$branch" '{
           resources: {
-            repositories: [
-              {
-                repository: "templates",
-                type: "github",
-                name: "nanoframework/nf-tools",
-                endpoint: "nanoframework"
-              },
+            repositories: [              
               {
                 self: {
                   refName: $branch
@@ -100,9 +94,10 @@ jobs:
               }
             ]
           },
-          parameters: $parameters,
-          ref: $branch
+          templateParameters: $parameters
         }')
+
+        echo "Request body: \"$bodyJson\""
 
         # Define the URL
         url="https://dev.azure.com/${organization}/${project}/_apis/pipelines/${pipelineId}/runs?api-version=7.1"
