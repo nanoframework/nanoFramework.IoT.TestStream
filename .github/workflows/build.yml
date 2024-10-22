@@ -84,7 +84,7 @@ jobs:
         echo "Branch for PR: \"$branch\""
 
         # Define the request body
-        bodyJson=$(jq -n --argjson parameters "$parametersJson" --arg branch "$branch" '{
+        bodyJson=$(jq -n --arg parameters "- $parametersJson" --arg branch "$branch" '{
           resources: {
             repositories:               
               {
