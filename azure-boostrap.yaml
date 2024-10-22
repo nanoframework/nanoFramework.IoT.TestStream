@@ -48,7 +48,7 @@ jobs:
       branch="refs/heads/${BUILD_SOURCEBRANCHNAME}"
 
       # Encode the PAT
-      patEncoded=$(echo -n ":${{ AZURE_DEVOPS_PAT }}" | base64)
+      patEncoded=$(echo -n ":${AZURE_DEVOPS_PAT}" | base64)
 
       # Define the headers
       headers=(
