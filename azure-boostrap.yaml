@@ -27,17 +27,18 @@ pr:
 jobs:
 - job: Trigger
   displayName: Trigger Azure Dev Ops build and test pipeline
-  runs-on: ubuntu-latest
+  pool:
+    vmImage: 'ubuntu-latest'
 
   steps:   
-  - name: Trigger Azure DevOps Pipeline
+  - displayName: 'Trigger Azure DevOps Pipeline'
     env:        
       AZURE_DEVOPS_ORG: nanoFramework
       AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
       AZURE_DEVOPS_PIPELINE_ID: 111
       AZURE_POOL_NAME: TestStream
       AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
-    run: |
+    script: |
       # Validate required environment variables
       for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME; do
           if [ -z "${!var}" ]; then
