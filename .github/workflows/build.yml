@@ -94,7 +94,7 @@ jobs:
               }
             ]
           },
-          templateParameters: $parameters
+          parameters: $parameters
         }')
 
         echo "Request body: \"$bodyJson\""
