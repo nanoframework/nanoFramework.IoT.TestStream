@@ -34,8 +34,7 @@ jobs:
     AZURE_DEVOPS_ORG: nanoFramework
     AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
     AZURE_DEVOPS_PIPELINE_ID: 111
-    AZURE_POOL_NAME: TestStream
-    AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
+    AZURE_POOL_NAME: TestStream    
 
   steps:   
   - script: |
@@ -128,6 +127,7 @@ jobs:
     displayName: 'Trigger Azure DevOps Pipeline'
     env:        
       BUILD_SOURCEBRANCH: $(Build.SourceBranch)
+      AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
   
   - script: |
       echo "Pipeline to monitor Run ID: $(run_id)"
@@ -166,3 +166,4 @@ jobs:
     displayName: 'Monitoring Azure DevOps pipeline'
     env:
       run_id: $(run_id)
+      AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
