@@ -65,6 +65,7 @@ Remove the trigger part and replace with, remove the cancel part as well:
 # The Pipeline is going to be called by the GitHub action.
 # Manual trigger is always possible.
 trigger: none
+pr: none
 ```
 
 Add the folling block after the `resources` entry:
@@ -75,8 +76,7 @@ parameters:
   displayName: List of capabilities to run the tests on
   type: object
   default:
-    - XIAO_ESP32C3
-    - ESP32_C3_REV3
+    - none
 ```
 
 > [!Important]
@@ -124,116 +124,180 @@ Add then this block at the very end, it will create multi stages that depends on
 > [!Important]
 > You have to list all the tests you want to run with each individual tests you want to run. Each line is a specific dll, separate the runsetting with the built dll with a coma.
 
-## Creating a GitHub Action to trigger the pipeline
+## Creating a new ADO pipeline to trigger the pipeline
 
-You will have to add a GitHub action in `.github\workflows` folders. You can name the file `build.yml`. And place the following content:
+You will have to add a new ADO pipeline. You can name the file `azure-bootstrap.yml`. And place the following content:
 
 ```yaml
-name: Trigger build pipeline
+# Copyright (c) .NET Foundation and Contributors
+# See LICENSE file in the project root for full license information.
 
-on:
-  pull_request:
-    branches:
+trigger:
+  branches:
+    include:
       - main
+      - develop
+      - release-*
+  paths:
+    exclude:
+      - .github_changelog_generator
+      - .gitignore
+      - CHANGELOG.md
+      - CODE_OF_CONDUCT.md
+      - LICENSE.md
+      - README.md
+      - NuGet.Config
+      - assets/*
+      - config/*
+      - .github/*
+
+# PR always trigger build
+pr:
+  autoCancel: true
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+- job: Trigger
+  displayName: Trigger Azure Dev Ops build and test pipeline
+  pool:
+    vmImage: 'ubuntu-latest'
 
-    steps: 
-    - name: Trigger Azure DevOps Pipeline
-      env:        
-        AZURE_DEVOPS_ORG: ${{ vars.AZURE_DEVOPS_ORG }}
-        AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
-        AZURE_DEVOPS_PIPELINE_ID: 111
-        AZURE_POOL_NAME: ${{ vars.AZURE_POOL_NAME }}
-        GITHUB_HEAD_REF: ${{ github.head_ref }}
-      run: |
-        # Validate required environment variables
-        for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME GITHUB_HEAD_REF; do
-            if [ -z "${!var}" ]; then
-                echo "Error: Required environment variable $var is not set"
-                exit 1
-            fi
-        done
+  variables:
+    AZURE_DEVOPS_ORG: nanoFramework
+    AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
+    AZURE_DEVOPS_PIPELINE_ID: 111
+    AZURE_POOL_NAME: TestStream    
 
-        # Define the Azure DevOps organization, project, and pipeline
-        organization="${AZURE_DEVOPS_ORG}"
-        project="${AZURE_DEVOPS_PROJECT}"
-        pipelineId="${AZURE_DEVOPS_PIPELINE_ID}"
-        poolName="${AZURE_POOL_NAME}"
-        branch="refs/heads/${GITHUB_HEAD_REF}"
+  steps:   
+  - script: |
+      # Validate required environment variables
+      for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME; do
+          if [ -z "${!var}" ]; then
+              echo "Error: Required environment variable $var is not set"
+              exit 1
+          fi
+      done
 
-        # Encode the PAT
-        patEncoded=$(echo -n ":${{ secrets.AZURE_DEVOPS_PAT }}" | base64)
+      # Define the Azure DevOps organization, project, and pipeline
+      organization="${AZURE_DEVOPS_ORG}"
+      project="${AZURE_DEVOPS_PROJECT}"
+      pipelineId="${AZURE_DEVOPS_PIPELINE_ID}"
+      poolName="${AZURE_POOL_NAME}"
+      branch="${BUILD_SOURCEBRANCH}"
 
-        # Define the headers
-        headers=(
-          -H "Authorization: Basic $patEncoded"
-          -H "Content-Type: application/json"
-        )
+      # Encode the PAT
+      patEncoded=$(echo -n ":${AZURE_DEVOPS_PAT}" | base64)
 
-        # Get the pool ID
-        url="https://dev.azure.com/${organization}/_apis/distributedtask/pools?poolName=${poolName}&api-version=7.1"
-        AZP_POOL_AGENTS=$(curl -s "${headers[@]}" -X GET "$url")
-        poolId=$(echo "$AZP_POOL_AGENTS" | jq -r '.value[0].id')
+      # Define the headers
+      headers=(
+        -H "Authorization: Basic $patEncoded"
+        -H "Content-Type: application/json"
+      )
 
-        echo "Pool ID: $poolId"
+      # Get the pool ID
+      url="https://dev.azure.com/${organization}/_apis/distributedtask/pools?poolName=${poolName}&api-version=7.1"
+      AZP_POOL_AGENTS=$(curl -s "${headers[@]}" -X GET "$url")
+      poolId=$(echo "$AZP_POOL_AGENTS" | jq -r '.value[0].id')
 
-        # Define the URL to get all agents in the pool
-        url="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents?includeCapabilities=true&api-version=7.1"
+      echo "Pool ID: $poolId"
 
-        response=$(curl -s -w "%{http_code}" "${headers[@]}" -X GET "$url")
-        http_code=${response: -3}
-        content=${response::-3}
+      # Define the URL to get all agents in the pool
+      url="https://dev.azure.com/${organization}/_apis/distributedtask/pools/${poolId}/agents?includeCapabilities=true&api-version=7.1"
 
-        if [ $http_code -eq 200 ]; then
-            # Extract all userCapabilities names for online and enabled agents as a unique list
-            capabilityNames=$(echo "$content" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys] | unique | flatten | join("\n- ")')
-        else
-            echo "Failed to retrieve agent capabilities. HTTP Status Code: $http_code"
-            echo "Response: \"$content\""
-            exit 1
-        fi
-        echo "Unique userCapabilities names: \"$capabilityNames\""
+      response=$(curl -s -w "%{http_code}" "${headers[@]}" -X GET "$url")
+      http_code=${response: -3}
+      content=${response::-3}
 
-        # Prepare the parameters
-        parametersJson=$(jq -n --arg appComponents "- $capabilityNames" '{templateParameters: {appComponents: $appComponents}}')
+      if [ $http_code -eq 200 ]; then
+          # Extract all userCapabilities names for online and enabled agents as a unique list
+          capabilityNames=$(echo "$content" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys] | unique | flatten | join("\n- ")')
+      else
+          echo "Failed to retrieve agent capabilities. HTTP Status Code: $http_code"
+          echo "Response: \"$content\""
+          exit 1
+      fi
+      echo "Unique userCapabilities names: \"$capabilityNames\""
 
-        echo "Parameters: \"$parametersJson\""
-        echo "Branch for PR: \"$branch\""
+      # Prepare the parameters
+      parametersJson=$(jq -n --arg appComponents "- $capabilityNames" '{templateParameters: {appComponents: $appComponents}}')
 
-        # Define the request body
-        bodyJson=$(jq -n --argjson parameters "$parametersJson" --arg branch "$branch" '{
-          resources: {
-            repositories:               
-              {
-                self: {
-                  refName: $branch
-                }
+      echo "Parameters: \"$parametersJson\""
+      echo "Branch for PR: \"$branch\""
+
+      # Define the request body
+      bodyJson=$(jq -n --argjson parameters "$parametersJson" --arg branch "$branch" '{
+        resources: {
+          repositories:               
+            {
+              self: {
+                refName: $branch
               }
-          },
-          templateParameters: $parameters.templateParameters
-        }')
+            }
+        },
+        templateParameters: $parameters.templateParameters
+      }')
 
-        echo "Request body: \"$bodyJson\""
+      echo "Request body: \"$bodyJson\""
 
-        # Define the URL
-        url="https://dev.azure.com/${organization}/${project}/_apis/pipelines/${pipelineId}/runs?api-version=7.1"
+      # Define the URL
+      url="https://dev.azure.com/${organization}/${project}/_apis/pipelines/${pipelineId}/runs?api-version=7.1"
 
-        # Trigger the pipeline
-        response=$(curl -s -w "%{http_code}" "${headers[@]}" -X POST -d "$bodyJson" "$url")
-        http_code=${response: -3}
-        content=${response::-3}
+      # Trigger the pipeline
+      response=$(curl -s -w "%{http_code}" "${headers[@]}" -X POST -d "$bodyJson" "$url")
+      http_code=${response: -3}
+      content=${response::-3}
 
-        if [ $http_code -eq 200 ]; then
-            run_id=$(echo "$content" | jq -r '.id')
-            echo "Pipeline triggered successfully. Run ID: $run_id"
-        else
-            echo "Failed to trigger pipeline. HTTP Status Code: $http_code"
-            echo "Response: $content"
-            exit 1
-        fi
+      if [ $http_code -eq 200 ]; then
+          run_id=$(echo "$content" | jq -r '.id')
+          echo "Pipeline triggered successfully. Run ID: $run_id"
+          echo "##vso[task.setvariable variable=run_id]$run_id"
+      else
+          echo "Failed to trigger pipeline. HTTP Status Code: $http_code"
+          echo "Response: $content"
+          exit 1
+      fi
+    displayName: 'Trigger Azure DevOps Pipeline'
+    env:        
+      BUILD_SOURCEBRANCH: $(Build.SourceBranch)
+      AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
+  
+  - script: |
+      echo "Pipeline to monitor Run ID: $(run_id)"
+      # Define the URL to get the pipeline run status
+      url="https://dev.azure.com/${AZURE_DEVOPS_ORG}/${AZURE_DEVOPS_PROJECT}/_apis/pipelines/${AZURE_DEVOPS_PIPELINE_ID}/runs/$(run_id)?api-version=7.1"
+
+      # Loop to monitor the pipeline run status
+      while true; do
+          response=$(curl -s -w "%{http_code}" -H "Authorization: Basic $(echo -n ":${AZURE_DEVOPS_PAT}" | base64)" -X GET "$url")
+          http_code=${response: -3}
+          content=${response::-3}
+
+          if [ $http_code -eq 200 ]; then
+              state=$(echo "$content" | jq -r '.state')
+              result=$(echo "$content" | jq -r '.result')
+
+              echo "Pipeline run state: $state"
+
+              if [ "$state" == "completed" ]; then
+                  echo "Pipeline run completed with result: $result"
+                  if [ "$result" == "succeeded" ]; then
+                      exit 0
+                  else
+                      exit 1
+                  fi
+              fi
+          else
+              echo "Failed to get pipeline run status. HTTP Status Code: $http_code"
+              echo "Response: $content"
+              exit 1
+          fi
+
+          # Wait for a while before checking again
+          sleep 30
+      done
+    displayName: 'Monitoring Azure DevOps pipeline'
+    env:
+      run_id: $(run_id)
+      AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
 ```
 
 You will have to adjust the following to match the ADO project name and pipeline ID:
@@ -242,3 +306,6 @@ You will have to adjust the following to match the ADO project name and pipeline
         AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
         AZURE_DEVOPS_PIPELINE_ID: 111
 ```
+
+> [!Important]
+> You **must** add a secret with the PAT token to the ADO pipeline. Make sure to check that it is a **secret**.
