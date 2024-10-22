@@ -42,7 +42,9 @@ jobs:
         project="${AZURE_DEVOPS_PROJECT}"
         pipelineId="${AZURE_DEVOPS_PIPELINE_ID}"
         poolName="${AZURE_POOL_NAME}"
-        branch="${GITHUB_REF}"
+        
+        # Get the branch name from GITHUB_REF and replace 'merge' with 'head'
+        branch=${GITHUB_REF/\/merge/\/head}
 
         # Encode the PAT
         patEncoded=$(echo -n ":${{ secrets.AZURE_DEVOPS_PAT }}" | base64)
