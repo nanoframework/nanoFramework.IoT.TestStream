@@ -42,7 +42,7 @@ jobs:
         project="${AZURE_DEVOPS_PROJECT}"
         pipelineId="${AZURE_DEVOPS_PIPELINE_ID}"
         poolName="${AZURE_POOL_NAME}"
-        branch="/refs/head/${GITHUB_HEAD_REF}"
+        branch="refs/head/${GITHUB_HEAD_REF}"
 
         # Encode the PAT
         patEncoded=$(echo -n ":${{ secrets.AZURE_DEVOPS_PAT }}" | base64)
