@@ -78,13 +78,13 @@ jobs:
         echo "Unique userCapabilities names: \"$capabilityNames\""
 
         # Prepare the parameters
-        parametersJson=$(jq -n --argjson appComponents "$capabilityNames" '{appComponents: $appComponents}')
+        parametersJson=$(jq -n --arg appComponents "- $capabilityNames" '{Parameters: {appComponents: $appComponents}}')
 
         echo "Parameters: \"$parametersJson\""
         echo "Branch for PR: \"$branch\""
 
         # Define the request body
-        bodyJson=$(jq -n --arg parameters "- $parametersJson" --arg branch "$branch" '{
+        bodyJson=$(jq -n --argjson parameters "$parametersJson" --arg branch "$branch" '{
           resources: {
             repositories:               
               {
