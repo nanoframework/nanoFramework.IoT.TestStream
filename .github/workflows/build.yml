@@ -78,7 +78,7 @@ jobs:
         echo "Unique userCapabilities names: \"$capabilityNames\""
 
         # Prepare the parameters
-        parametersJson=$(jq -n --arg appComponents "- $capabilityNames" '{Parameters: {appComponents: $appComponents}}')
+        parametersJson=$(jq -n --arg appComponents "- $capabilityNames" '{templateParameters: {appComponents: $appComponents}}')
 
         echo "Parameters: \"$parametersJson\""
         echo "Branch for PR: \"$branch\""
@@ -93,7 +93,7 @@ jobs:
                 }
               }            
           },
-          parameters: $parameters
+          templateParameters: $parameters.templateParameters
         }')
 
         echo "Request body: \"$bodyJson\""
