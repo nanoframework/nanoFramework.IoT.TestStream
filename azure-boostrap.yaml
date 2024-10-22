@@ -1,0 +1,73 @@
+# Copyright (c) .NET Foundation and Contributors
+# See LICENSE file in the project root for full license information.
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+      - release-*
+  paths:
+    exclude:
+      - .github_changelog_generator
+      - .gitignore
+      - CHANGELOG.md
+      - CODE_OF_CONDUCT.md
+      - LICENSE.md
+      - README.md
+      - NuGet.Config
+      - assets/*
+      - config/*
+      - .github/*
+
+# PR always trigger build
+pr:
+  autoCancel: true
+
+jobs:
+- job: Trigger
+  displayName: Trigger Azure Dev Ops build and test pipeline
+  runs-on: ubuntu-latest
+
+  steps:   
+  - name: Trigger Azure DevOps Pipeline
+    env:        
+      AZURE_DEVOPS_ORG: nanoFramework
+      AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
+      AZURE_DEVOPS_PIPELINE_ID: 111
+      AZURE_POOL_NAME: TestStream
+      AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
+    run: |
+      # Validate required environment variables
+      for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME; do
+          if [ -z "${!var}" ]; then
+              echo "Error: Required environment variable $var is not set"
+              exit 1
+          fi
+      done
+
+      # Define the Azure DevOps organization, project, and pipeline
+      organization="${AZURE_DEVOPS_ORG}"
+      project="${AZURE_DEVOPS_PROJECT}"
+      pipelineId="${AZURE_DEVOPS_PIPELINE_ID}"
+      poolName="${AZURE_POOL_NAME}"
+      branch="refs/heads/${{ Build.SourceBranchName }}"
+
+      # Encode the PAT
+      patEncoded=$(echo -n ":${{ AZURE_DEVOPS_PAT }}" | base64)
+
+      # Define the headers
+      headers=(
+        -H "Authorization: Basic $patEncoded"
+        -H "Content-Type: application/json"
+      )
+
+      # Get the pool ID
+      url="https://dev.azure.com/${organization}/_apis/distributedtask/pools?poolName=${poolName}&api-version=7.1"
+      AZP_POOL_AGENTS=$(curl -s "${headers[@]}" -X GET "$url")
+      poolId=$(echo "$AZP_POOL_AGENTS" | jq -r '.value[0].id')
+
+      echo "Pool ID: $poolId"
+
+      # Define the URL to get all agents in the pool
+      url="https://dev.azure.com/${organization}/_
