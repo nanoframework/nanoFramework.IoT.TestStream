@@ -45,7 +45,7 @@ jobs:
       project="${AZURE_DEVOPS_PROJECT}"
       pipelineId="${AZURE_DEVOPS_PIPELINE_ID}"
       poolName="${AZURE_POOL_NAME}"
-      branch="refs/heads/${{ Build.SourceBranchName }}"
+      branch="refs/heads/${BUILD_SOURCEBRANCHNAME}"
 
       # Encode the PAT
       patEncoded=$(echo -n ":${{ AZURE_DEVOPS_PAT }}" | base64)
@@ -124,3 +124,4 @@ jobs:
       AZURE_DEVOPS_PIPELINE_ID: 111
       AZURE_POOL_NAME: TestStream
       AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
+      BUILD_SOURCEBRANCHNAME: ${{ Build.SourceBranchName }}
