@@ -2,8 +2,10 @@
 # See LICENSE file in the project root for full license information.
 
 # The Pipeline is going to be called by the GitHub action.
-# Manual trigger is always possible.
+# Manual trigger is always possible and it can show up.
+# In theory, the template should not be trigger at all.
 trigger: none
+pr: none
 
 # add nf-tools repo to resources (for Azure Pipelines templates)
 resources:
@@ -18,9 +20,11 @@ parameters:
   displayName: List of capabilities to run the tests on
   type: object
   default:
-    - XIAO_ESP32C3
-    - ESP32_C3_REV3
-    - ESP32_REV0
+  # nothing at merge, just the build
+    - none
+  #  - XIAO_ESP32C3
+  #  - ESP32_C3_REV3
+  #  - ESP32_REV0
 
 stages:
 - stage: Build
@@ -58,9 +62,10 @@ stages:
         path: '$(System.DefaultWorkingDirectory)'
         artifactName: 'Artifacts'
 
-- ${{ each appComponents in parameters.appComponents }}:   
-  - template: test.yml
-    parameters:
-      appComponents: ${{ appComponents }}
-      unitTestRunsettings: 
-        - 'UnitTestStream/nano.runsettings,UnitTestStream/bin/Release/NFUnitTest.dll'
+- ${{ each appComponents in parameters.appComponents }}:
+  - ${{ if ne(appComponents, 'none') }}:
+    - template: test.yml
+      parameters:
+        appComponents: ${{ appComponents }}
+        unitTestRunsettings: 
+          - 'UnitTestStream/nano.runsettings,UnitTestStream/bin/Release/NFUnitTest.dll'
