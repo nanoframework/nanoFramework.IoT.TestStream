@@ -30,7 +30,7 @@ jobs:
         GITHUB_HEAD_REF: ${{ github.head_ref }}
       run: |
         # Validate required environment variables
-        for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME GITHUB_REF; do
+        for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME GITHUB_HEAD_REF; do
             if [ -z "${!var}" ]; then
                 echo "Error: Required environment variable $var is not set"
                 exit 1
@@ -91,7 +91,7 @@ jobs:
                 self: {
                   refName: $branch
                 }
-              }            
+              }
           },
           templateParameters: $parameters.templateParameters
         }')
@@ -113,5 +113,5 @@ jobs:
             echo "Failed to trigger pipeline. HTTP Status Code: $http_code"
             echo "Response: $content"
             exit 1
-        fi    
+        fi
         

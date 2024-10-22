@@ -142,14 +142,15 @@ jobs:
 
     steps: 
     - name: Trigger Azure DevOps Pipeline
-      env:
-        AZURE_DEVOPS_ORG: nanoframework
+      env:        
+        AZURE_DEVOPS_ORG: ${{ vars.AZURE_DEVOPS_ORG }}
         AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
         AZURE_DEVOPS_PIPELINE_ID: 111
-        AZURE_POOL_NAME: TestStream
+        AZURE_POOL_NAME: ${{ vars.AZURE_POOL_NAME }}
+        GITHUB_HEAD_REF: ${{ github.head_ref }}
       run: |
         # Validate required environment variables
-        for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME; do
+        for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME GITHUB_HEAD_REF; do
             if [ -z "${!var}" ]; then
                 echo "Error: Required environment variable $var is not set"
                 exit 1
@@ -161,6 +162,7 @@ jobs:
         project="${AZURE_DEVOPS_PROJECT}"
         pipelineId="${AZURE_DEVOPS_PIPELINE_ID}"
         poolName="${AZURE_POOL_NAME}"
+        branch="refs/heads/${GITHUB_HEAD_REF}"
 
         # Encode the PAT
         patEncoded=$(echo -n ":${{ secrets.AZURE_DEVOPS_PAT }}" | base64)
@@ -187,7 +189,7 @@ jobs:
 
         if [ $http_code -eq 200 ]; then
             # Extract all userCapabilities names for online and enabled agents as a unique list
-            capabilityNames=$(echo "$content" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys] | unique')
+            capabilityNames=$(echo "$content" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys] | unique | flatten | join("\n- ")')
         else
             echo "Failed to retrieve agent capabilities. HTTP Status Code: $http_code"
             echo "Response: \"$content\""
@@ -196,24 +198,25 @@ jobs:
         echo "Unique userCapabilities names: \"$capabilityNames\""
 
         # Prepare the parameters
-        parametersJson=$(jq -n --argjson appComponents "$capabilityNames" '{appComponents: $appComponents}')
+        parametersJson=$(jq -n --arg appComponents "- $capabilityNames" '{templateParameters: {appComponents: $appComponents}}')
 
         echo "Parameters: \"$parametersJson\""
+        echo "Branch for PR: \"$branch\""
 
         # Define the request body
-        bodyJson=$(jq -n --argjson parameters "$parametersJson" '{
+        bodyJson=$(jq -n --argjson parameters "$parametersJson" --arg branch "$branch" '{
           resources: {
-            repositories: [
+            repositories:               
               {
-                repository: "templates",
-                type: "github",
-                name: "nanoframework/nf-tools",
-                endpoint: "nanoframework"
+                self: {
+                  refName: $branch
+                }
               }
-            ]
           },
-          parameters: $parameters
+          templateParameters: $parameters.templateParameters
         }')
+
+        echo "Request body: \"$bodyJson\""
 
         # Define the URL
         url="https://dev.azure.com/${organization}/${project}/_apis/pipelines/${pipelineId}/runs?api-version=7.1"
@@ -230,8 +233,7 @@ jobs:
             echo "Failed to trigger pipeline. HTTP Status Code: $http_code"
             echo "Response: $content"
             exit 1
-        fi    
-
+        fi
 ```
 
 You will have to adjust the following to match the ADO project name and pipeline ID:
@@ -240,4 +242,3 @@ You will have to adjust the following to match the ADO project name and pipeline
         AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
         AZURE_DEVOPS_PIPELINE_ID: 111
 ```
-
