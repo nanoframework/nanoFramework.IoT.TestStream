@@ -14,9 +14,6 @@ resources:
       type: github
       name: nanoframework/nf-tools
       endpoint: nanoframework
-    - repository: self
-      type: github
-      name: nanoFramework/nanoFramework.IoT.TestStream
 
 parameters:
 - name: appComponents
