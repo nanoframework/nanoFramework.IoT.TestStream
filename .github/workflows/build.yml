@@ -69,7 +69,7 @@ jobs:
 
         if [ $http_code -eq 200 ]; then
             # Extract all userCapabilities names for online and enabled agents as a unique list
-            capabilityNames=$(echo "$content" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys] | unique | flatten')
+            capabilityNames=$(echo "$content" | jq -r '[.value[] | select(.status == "online" and .enabled == true) | .userCapabilities | keys] | unique | flatten | join("\n- ")')
         else
             echo "Failed to retrieve agent capabilities. HTTP Status Code: $http_code"
             echo "Response: \"$content\""
@@ -93,7 +93,7 @@ jobs:
                 }
               }            
           },
-          parameters: $parameters
+          templateParameters: $parameters
         }')
 
         echo "Request body: \"$bodyJson\""
@@ -114,31 +114,4 @@ jobs:
             echo "Response: $content"
             exit 1
         fi    
-
-        # while true; do
-        #     status_url="https://dev.azure.com/${organization}/${project}/_apis/pipelines/${pipelineId}/runs/${run_id}?api-version=7.1"
-        #     status_response=$(curl -s -w "%{http_code}" "${headers[@]}" -X GET "$status_url")
-        #     status_http_code=${status_response: -3}
-        #     status_content=${status_response::-3}
-        #     if [ $status_http_code -eq 200 ]; then
-        #         status=$(echo "$status_content" | jq -r '.status')
-        #         echo "Pipeline status: $status"
-        #         if [ "$status" == "completed" ]; then
-        #             result=$(echo "$status_content" | jq -r '.result')
-        #             echo "Pipeline result: $result"
-        #             if [ "$result" == "succeeded" ]; then
-        #                 echo "Pipeline completed successfully."
-        #                 break
-        #             else
-        #                 echo "Pipeline failed."
-        #                 exit 1
-        #             fi
-        #         fi
-        #     else
-        #         echo "Failed to check pipeline status. HTTP Status Code: $status_http_code"
-        #         echo "Response: $status_content"
-        #         exit 1
-        #     fi
-        #     # Wait for a while before checking the status again
-        #     sleep 30
-        # done        
+        
