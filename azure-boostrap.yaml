@@ -124,4 +124,4 @@ jobs:
       AZURE_DEVOPS_PIPELINE_ID: 111
       AZURE_POOL_NAME: TestStream
       AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
-      BUILD_SOURCEBRANCHNAME: ${{ Build.SourceBranchName }}
+      BUILD_SOURCEBRANCHNAME: $(Build.SourceBranchName)
