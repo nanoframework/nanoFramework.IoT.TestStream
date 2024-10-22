@@ -17,7 +17,6 @@ resources:
     - repository: self
       type: github
       name: nanoFramework/nanoFramework.IoT.TestStream
-      ref: refs/pull/17/head
 
 parameters:
 - name: appComponents
