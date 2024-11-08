@@ -1,18 +1,18 @@
 parameters:
-    - name: AZURE_DEVOPS_ORG
-      displayName: Azure DevOps organization
-      type: string
-      default: nanoFramework
-    - name: AZURE_DEVOPS_PROJECT
-      displayName: Azure DevOps project
-      type: string
-    - name: AZURE_DEVOPS_PIPELINE_ID
-      displayName: Azure DevOps pipeline ID
-      type: number
-    - name: AZURE_POOL_NAME
-      displayName: Azure DevOps pool name
-      type: string
-      default: TestStream
+  - name: AZURE_DEVOPS_ORG
+    displayName: Azure DevOps organization
+    type: string
+    default: nanoFramework
+  - name: AZURE_DEVOPS_PROJECT
+    displayName: Azure DevOps project
+    type: string
+  - name: AZURE_DEVOPS_PIPELINE_ID
+    displayName: Azure DevOps pipeline ID
+    type: number
+  - name: AZURE_POOL_NAME
+    displayName: Azure DevOps pool name
+    type: string
+    default: TestStream
 
 steps:   
   - script: |

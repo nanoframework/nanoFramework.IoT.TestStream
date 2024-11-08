@@ -29,9 +29,9 @@ jobs:
   displayName: Trigger Azure Dev Ops build and test pipeline
   pool:
     vmImage: 'ubuntu-latest'
-    
+
 steps:
   - template: bootstrap.yml
-      parameters:
-        AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
-        AZURE_DEVOPS_PIPELINE_ID: 111
+    parameters:
+      AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
+      AZURE_DEVOPS_PIPELINE_ID: 111
