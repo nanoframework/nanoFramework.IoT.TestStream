@@ -24,6 +24,12 @@ trigger:
 pr:
   autoCancel: true
 
+jobs:
+- job: Trigger
+  displayName: Trigger Azure Dev Ops build and test pipeline
+  pool:
+    vmImage: 'ubuntu-latest'
+    
 steps:
   - template: bootstrap.yml
       parameters:

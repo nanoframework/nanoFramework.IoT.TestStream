@@ -14,13 +14,7 @@ parameters:
       type: string
       default: TestStream
 
-jobs:
-- job: Trigger
-  displayName: Trigger Azure Dev Ops build and test pipeline
-  pool:
-    vmImage: 'ubuntu-latest'
-
-  steps:   
+steps:   
   - script: |
       # Validate required environment variables
       for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME; do
