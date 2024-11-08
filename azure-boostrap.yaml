@@ -30,7 +30,7 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
 
-steps:
+  steps:
   - template: bootstrap.yml
     parameters:
       AZURE_DEVOPS_PROJECT: nanoFramework.IoT.TestStream
