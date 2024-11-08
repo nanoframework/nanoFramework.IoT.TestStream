@@ -6,16 +6,26 @@ parameters:
   - name: AZURE_DEVOPS_PROJECT
     displayName: Azure DevOps project
     type: string
+    required: true
   - name: AZURE_DEVOPS_PIPELINE_ID
     displayName: Azure DevOps pipeline ID
     type: number
+    required: true
   - name: AZURE_POOL_NAME
     displayName: Azure DevOps pool name
     type: string
     default: TestStream
 
-steps:   
+steps:
   - script: |
+      # Validate required environment variables
+      for var in AZURE_DEVOPS_PAT BUILD_SOURCEBRANCH; do
+        if [ -z "${!var}" ]; then
+          echo "Error: $var environment variable is not set"
+          exit 1
+        fi
+      done
+
       # Define the Azure DevOps organization, project, and pipeline
       organization="${{ parameters.AZURE_DEVOPS_ORG }}"
       project="${{ parameters.AZURE_DEVOPS_PROJECT }}"
@@ -65,7 +75,7 @@ steps:
       # Define the request body
       bodyJson=$(jq -n --argjson parameters "$parametersJson" --arg branch "$branch" '{
         resources: {
-          repositories:               
+          repositories:
             {
               self: {
                 refName: $branch
@@ -95,10 +105,10 @@ steps:
           exit 1
       fi
     displayName: 'Trigger Azure DevOps Pipeline'
-    env:        
+    env:
       BUILD_SOURCEBRANCH: $(Build.SourceBranch)
       AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
-  
+
   - script: |
       echo "Pipeline to monitor Run ID: $(run_id)"
       echo "Pipeline direct link: https://dev.azure.com/${{ parameters.AZURE_DEVOPS_ORG }}/${{ parameters.AZURE_DEVOPS_PROJECT }}/_build/results?buildId=$(run_id)"
