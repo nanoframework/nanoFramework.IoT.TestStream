@@ -17,10 +17,10 @@ parameters:
 steps:   
   - script: |
       # Define the Azure DevOps organization, project, and pipeline
-      organization="${parameters.AZURE_DEVOPS_ORG}"
-      project="${parameters.AZURE_DEVOPS_PROJECT}"
-      pipelineId="${parameters.AZURE_DEVOPS_PIPELINE_ID}"
-      poolName="${parameters.AZURE_POOL_NAME}"
+      organization="${{ parameters.AZURE_DEVOPS_ORG }}"
+      project="${{ parameters.AZURE_DEVOPS_PROJECT }}"
+      pipelineId="${{ parameters.AZURE_DEVOPS_PIPELINE_ID }}"
+      poolName="${{ parameters.AZURE_POOL_NAME }}"
       branch="${BUILD_SOURCEBRANCH}"
 
       # Encode the PAT
@@ -101,9 +101,9 @@ steps:
   
   - script: |
       echo "Pipeline to monitor Run ID: $(run_id)"
-      echo "Pipeline direct link: https://dev.azure.com/${parameters.AZURE_DEVOPS_ORG}/${parameters.AZURE_DEVOPS_PROJECT}/_build/results?buildId=$(run_id)"
+      echo "Pipeline direct link: https://dev.azure.com/${{ parameters.AZURE_DEVOPS_ORG }}/${{ parameters.AZURE_DEVOPS_PROJECT }}/_build/results?buildId=$(run_id)"
       # Define the URL to get the pipeline run status
-      url="https://dev.azure.com/${parameters.AZURE_DEVOPS_ORG}/${parameters.AZURE_DEVOPS_PROJECT}/_apis/pipelines/${parameters.AZURE_DEVOPS_PIPELINE_ID}/runs/$(run_id)?api-version=7.1"
+      url="https://dev.azure.com/${{ parameters.AZURE_DEVOPS_ORG }}/${{ parameters.AZURE_DEVOPS_PROJECT }}/_apis/pipelines/${{ parameters.AZURE_DEVOPS_PIPELINE_ID }}/runs/$(run_id)?api-version=7.1"
 
       # Loop to monitor the pipeline run status
       while true; do
