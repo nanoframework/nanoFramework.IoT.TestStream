@@ -16,14 +16,6 @@ parameters:
 
 steps:   
   - script: |
-      # Validate required parameters
-      for var in AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT AZURE_DEVOPS_PIPELINE_ID AZURE_POOL_NAME; do
-          if [ -z "${{ parameters[$var] }}" ]; then
-              echo "Error: Required parameter $var is not set"
-              exit 1
-          fi
-      done
-
       # Define the Azure DevOps organization, project, and pipeline
       organization="${parameters.AZURE_DEVOPS_ORG}"
       project="${parameters.AZURE_DEVOPS_PROJECT}"
