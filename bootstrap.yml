@@ -3,18 +3,22 @@ parameters:
     displayName: Azure DevOps organization
     type: string
     default: nanoFramework
+    pattern: '^[a-zA-Z0-9-]+$'
   - name: AZURE_DEVOPS_PROJECT
     displayName: Azure DevOps project
     type: string
     required: true
+    pattern: '^[a-zA-Z0-9-_.]+$'
   - name: AZURE_DEVOPS_PIPELINE_ID
     displayName: Azure DevOps pipeline ID
     type: number
+    minimum: 1
     required: true
   - name: AZURE_POOL_NAME
     displayName: Azure DevOps pool name
     type: string
     default: TestStream
+    pattern: '^[a-zA-Z0-9-]+$'
 
 steps:
   - script: |
