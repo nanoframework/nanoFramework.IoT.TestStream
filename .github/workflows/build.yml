@@ -20,4 +20,3 @@ jobs:
 
     - name: Build the project
       run: dotnet build TestStream.Runner/TestStream.Runner.csproj
-        
