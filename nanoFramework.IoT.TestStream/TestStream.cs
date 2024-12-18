@@ -9,6 +9,8 @@ namespace nanoFramework.IoT.TestStream
 
         public int Subtract(int a, int b) => a - b;
 
+        public int Multiply(int a, int b) => a * b;
+
         public void OpenPinBlinkAndClose(int pinNumber)
         {
          GpioController gpioController = new GpioController();
