@@ -35,6 +35,10 @@ steps:
       poolName="${{ parameters.AZURE_POOL_NAME }}"
       branch="${BUILD_SOURCEBRANCH}"
 
+      # Replace 'merge' with 'head' in the $branch variable
+      branch=$(echo "$branch" | sed 's/merge/head/')
+      echo "Updated branch: $branch"
+
       # Fetch the PR details from GitHub to get the title
       # Extract the PR ID from the branch name
       auth=$(echo -n ":$GITHUBTOKEN" | base64)
@@ -107,8 +111,7 @@ steps:
             }
           }
         },
-        templateParameters: $parameters.templateParameters,
-        prTitle: $prTitle
+        templateParameters: $parameters.templateParameters
       }')
 
       echo "Request body: \"$bodyJson\""
