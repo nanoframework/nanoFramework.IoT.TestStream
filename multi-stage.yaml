@@ -46,6 +46,8 @@ stages:
       nugetPackageName: 'nanoFramework.IoT.TestStream'
 
     steps:
+    - script: echo "##vso[build.addbuildtag]PR TITLE"
+      displayName: 'Set Build Title'
 
     # step from template @ nf-tools repo
     # only build and run tests
