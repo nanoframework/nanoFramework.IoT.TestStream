@@ -15,6 +15,10 @@ parameters:
     default: TestStream
 
 steps:
+  - checkout: self
+    clean: true
+    fetchDepth: 1
+
   - script: |
       # Validate required environment variables
       for var in AZURE_DEVOPS_PAT BUILD_SOURCEBRANCH; do
@@ -30,6 +34,34 @@ steps:
       pipelineId="${{ parameters.AZURE_DEVOPS_PIPELINE_ID }}"
       poolName="${{ parameters.AZURE_POOL_NAME }}"
       branch="${BUILD_SOURCEBRANCH}"
+
+      # Replace 'merge' with 'head' in the $branch variable
+      branch=$(echo "$branch" | sed 's/merge/head/')
+      echo "Updated branch: $branch"
+
+      # Fetch the PR details from GitHub to get the title
+      # Extract the PR ID from the branch name
+      auth=$(echo -n ":$GITHUBTOKEN" | base64)
+      auth="basic $auth"
+
+      prUrl="https://api.github.com/repos/$BUILD_REPOSITORY_NAME/pulls/$SYSTEM_PULLREQUEST_PULLREQUESTNUMBER"
+      response=$(curl -s -w "%{http_code}" -H "Authorization: $auth" -X GET "$prUrl")
+      http_code=${response: -3}
+      content=${response::-3}
+
+      if [ $http_code -eq 200 ]; then  
+          prTitle=$(echo "$content" | jq -r '.title')  
+          if [ "$prTitle" = "null" ]; then  
+              echo "Error: Failed to extract PR title from response"  
+              exit 1  
+          fi  
+      else  
+          echo "Error: Failed to fetch PR details. Status code: $http_code"  
+          echo "Response: $content"  
+          exit 1  
+      fi  
+
+      echo "PR Title: $prTitle"
 
       # Encode the PAT
       patEncoded=$(echo -n ":${AZURE_DEVOPS_PAT}" | base64)
@@ -71,14 +103,13 @@ steps:
       echo "Branch for PR: \"$branch\""
 
       # Define the request body
-      bodyJson=$(jq -n --argjson parameters "$parametersJson" --arg branch "$branch" '{
+      bodyJson=$(jq -n --argjson parameters "$parametersJson" --arg branch "$branch" --arg prTitle "$prTitle" '{
         resources: {
-          repositories:
-            {
-              self: {
-                refName: $branch
-              }
+          repositories: {
+            self: {
+              refName: $branch
             }
+          }
         },
         templateParameters: $parameters.templateParameters
       }')
