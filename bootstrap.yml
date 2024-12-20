@@ -87,9 +87,9 @@ steps:
         -H "Content-Type: application/json"
       )
 
-      if [ $skipHardwareTest -eq true ]; then
+      if [ "$skipHardwareTest" = "1" ]; then
         # Set the capabilityNames to none
-        capabilityNames="none";        
+        capabilityNames="none"       
       else
         # Get the pool ID
         url="https://dev.azure.com/${organization}/_apis/distributedtask/pools?poolName=${poolName}&api-version=7.1"
