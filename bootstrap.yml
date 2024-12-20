@@ -87,7 +87,7 @@ steps:
         -H "Content-Type: application/json"
       )
 
-      if [ skipHardwareTest -eq true ]; then
+      if [ $skipHardwareTest -eq true ]; then
         capabilityNames="none";
       else
         # Get the pool ID
