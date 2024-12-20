@@ -88,7 +88,8 @@ steps:
       )
 
       if [ $skipHardwareTest -eq true ]; then
-        capabilityNames="none";
+        # Set the capabilityNames to none
+        capabilityNames="none";        
       else
         # Get the pool ID
         url="https://dev.azure.com/${organization}/_apis/distributedtask/pools?poolName=${poolName}&api-version=7.1"
