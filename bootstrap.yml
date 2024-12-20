@@ -87,7 +87,7 @@ steps:
         -H "Content-Type: application/json"
       )
 
-      if [ "$skipHardwareTest" = "1" ]; then
+      if [ "$skipHardwareTest" = "true" ]; then
         # Set the capabilityNames to none
         capabilityNames="none"       
       else
