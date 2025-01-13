@@ -15,4 +15,4 @@ jobs:
     uses: nanoframework/nf-tools/.github/workflows/update-dependencies.yml@main
     secrets: inherit
     with:
-      solutionsToCheck: 'nanoFramework.Json.sln'
+      solutionsToCheck: 'nanoFramework.IoT.TestStream.sln'
