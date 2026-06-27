@@ -15,7 +15,7 @@ Then, you can run the `.\config.cmd` where you will be prompted for:
 * the serveur URL: `https://dev.azure.com/nanoframework`
 * the authentication, use the default PAT
 * paste your PAT token when asked
-* the agent poolo is: `TestStream`
+* the agent pool is: `TestStream`
 * use the default `_work` directory
 * select if you want or not install the agent as a service or not
 
@@ -27,8 +27,9 @@ You'll need to install on the machine:
 
 * [.NET 8.0](https://dotnet.microsoft.com/en-us/download)
 * [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
+* Optional windows updates or manual install serial port drivers for your device(s)
 
-## Setup capacities
+## Setup agent capabilities
 
 Once you've been running the previous configuration, you'll need to create a `configuration.json` file in the `C:\agent` directory.
 
