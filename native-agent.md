@@ -10,6 +10,12 @@ Before attempting a first install, you will first need to install these dependen
 
 ## Agent installation
 Download the latest repo source.
+
+Download the latest agent installation runner
+![instructions](./docs/native-setup.png)
+
+By default, the agent will advertise almost all your environment variables including the name of the user, some key directories, and many many other elements. You can get rid of this by setting up the VSO_AGENT_IGNORE environment variable. Run the script with this specific setup to create this environment variable **before** you setup the configuration.
+
 From your source download directory, open the terminal as administrator, then:
 
 ```powershell
@@ -17,10 +23,6 @@ From your source download directory, open the terminal as administrator, then:
 ```
 
 Follow the instruction that will looks like this:
-
-![instructions](./docs/native-setup.png)
-
-By default, the agent will advertise almost all your environement variables including the name of the user, some key directories, and many many other elements. You can get rid of this by setting up the VSO_AGENT_IGNORE environement variable. Run the script with this specific setup to create this environement variable **before** you setup the configuration.
 
 Then, you can run the `.\config.cmd` where you will be prompted for:
 
@@ -62,7 +64,7 @@ $env:AZP_TOKEN="yourPersonalAccessToken"
 .\capabilities.ps1
 ```
 
-The token will only be used during the setup of the capability and will be deleted after from the environement and from a temporary file that will be created.
+The token will only be used during the setup of the capability and will be deleted after from the environment and from a temporary file that will be created.
 
 > [!Important]
 > You will have to run this script every time you change the capabilities, meaning, adding or removing hardware.

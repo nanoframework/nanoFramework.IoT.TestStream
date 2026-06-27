@@ -19,7 +19,7 @@ The application will first check that it is not running already as a scheduled t
 
 ![task install](./docs/setup-task-install.png)
 
-You'll know if you've been sucessfull. In case, you're not, it's most likely because you are not running this setup in an elevated prompt.
+You'll know if you've been sucessful. In case, you're not, it's most likely because you are not running this setup in an elevated prompt.
 
 ![task success](./docs/setup-task-success.png)
 
@@ -58,7 +58,7 @@ And finally, once installed, you'll have to type `exit`.
 
 The setup will continue with the installation of USBIPD.
 
-In case you already have an environement properly setup with WSL2 and Docker, if you are just missing USBIPD, you'll be prompted to install it:
+In case you already have an environment properly setup with WSL2 and Docker, if you are just missing USBIPD, you'll be prompted to install it:
 
 ![usbipd install](./docs/setup-usbipd-installation.png)
 
