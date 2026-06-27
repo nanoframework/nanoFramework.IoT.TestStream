@@ -1,5 +1,15 @@
 # Native agent installation
 
+## Pre requirements
+
+Before attempting a first install, you will first need to install these dependencies on your PC:
+
+* [.NET 8.0](https://dotnet.microsoft.com/en-us/download).
+* [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48).
+* Optional windows updates and/or manual install serial port drivers for your nanoframework compatible device(s).
+
+It is also reccomended that you move the `agent` folder to the root of the filesystem.
+
 Follow the instruction that will looks like this:
 
 ![instructions](./docs/native-setup.png)
@@ -21,13 +31,7 @@ Then, you can run the `.\config.cmd` where you will be prompted for:
 
 Copy the [capabilities.ps1](./agent/capabilities.ps1) file to the C`:\agent` folder.
 
-## Pre requirements
 
-You will first need to install these dependencies on your PC:
-
-* [.NET 8.0](https://dotnet.microsoft.com/en-us/download).
-* [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48).
-* Optional windows updates and/or manual install serial port drivers for your nanoframework compatible device(s).
 
 ## Setup agent capabilities
 
