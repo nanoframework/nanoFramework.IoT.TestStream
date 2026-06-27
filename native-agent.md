@@ -28,7 +28,7 @@ Then, you can run the `.\config.cmd` where you will be prompted for:
 
 * the serveur URL: `https://dev.azure.com/nanoframework`
 * the authentication, use the default PAT
-* paste your PAT token when asked
+* paste your Personal access token when asked
 * the agent pool is: `TestStream`
 * use the default `_work` directory
 * select if you want or not install the agent as a service or not
@@ -74,4 +74,4 @@ The token will only be used during the setup of the capability and will be delet
 Depending on what you have chosen during the installation, it will either run as a service, or on demand. You could also create an OS task for your specific needs.
 
 > [!Important]
-> When the Person Access Token expires, you'll need to rerun the configuration with your new one, there will not be a warning that it has expired.
+> When the Personal Access Token expires, you will need to rerun the configuration with your new one, there will not be a warning that it has expired.
