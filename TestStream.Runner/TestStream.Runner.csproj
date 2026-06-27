@@ -20,6 +20,8 @@
 		<PackageIconUrl></PackageIconUrl>
 		<Description>.NET nanoFramework.IoT.TestRunner tool to manage self hosted agents.</Description>
 		<PublishSingleFile>true</PublishSingleFile>
+		<StartupObject>nanoFramework.IoT.TestRunner.Runner</StartupObject>
+		<AssemblyTitle>nanoFramework TestRunner</AssemblyTitle>
 	</PropertyGroup>
 
 	<ItemGroup>
