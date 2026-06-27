@@ -6,7 +6,7 @@
 
 # Welcome to the .NET **nanoFramework** nanoFramework.IoT.TestStream Library repository
 
-The [`TestStream.Runner`](./TestStream.Runner) application is designed to manage device connections within a WSL environment, run the ADO agent. It has a feature to setup new devices and is specifically focusing on identifying new serial ports created when new hardware is connected. It handles errors gracefully and provides feedback to the user through console messages and logging.
+The [`TestStream.Runner`](./TestStream.Runner) application is designed to manage device connections within a native windows, or WSL environment, run the ADO agent. It has a feature to setup new devices and is specifically focusing on identifying new serial ports created when new hardware is connected. It handles errors gracefully and provides feedback to the user through console messages and logging.
 
 The setup feature allows to smoothly add new devices, bind them and attach them in full transparency into WSL. Configuration files are created so that users do not have to worry about the complexity behind.
 
@@ -19,10 +19,12 @@ An automatic assisted setup with a nice Terminal.Gui UI is available. You also h
 > The only important code is present in the [TestStream.Runner](./TestStream.Runner) directory.
 
 ## Native Windows Agent
-For a native Windows agent installation, see [this](./native-agent.md) document.
 
-## WSL or Linux compatible agent
-For WSL agent installation, see [this](./wsl-agent.md)
+For a native Windows agent installation, see [this document](./native-agent.md).
+
+## WSL compatible agent
+
+For WSL agent installation, see [this document](./wsl-agent.md).
 
 ## Maintainer documentation
 
