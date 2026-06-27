@@ -87,7 +87,7 @@ Once done or if the image is already built, you'll be able to click `Finish`.
 
 **Congratulations**, you've setup everything properly. To add a new device, please run again the application in setup mode.
 
-If you've selected to start the task automatically, you'll see a new prompt starting. It will try to connect to the Azure Dev Ops Agent pipeline and also advertize as capacities the devices you have setup.
+If you've selected to start the task automatically, you'll see a new prompt starting. It will try to connect to the Azure Dev Ops Agent pipeline and it will also advertise the capabilities of any devices you have setup.
 
 ![task success](./docs/task-running-success.png)
 
