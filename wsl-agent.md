@@ -1,5 +1,8 @@
 # WSL agent installation
 
+## Download and unzip the artifact
+
+Go to the [Releases](https://github.com/nanoframework/nanoFramework.IoT.TestStream/releases) page and download the latest `TestStream.Runner.zip`. Unzip the compressed file on your Windows machine, which contains the executable needed scripts and configuration files, and a folder `agent`.
 
 ## Automatic configuration
 

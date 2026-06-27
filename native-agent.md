@@ -4,15 +4,17 @@
 
 Before attempting a first install, you will first need to install these dependencies on your PC:
 
-* [.NET 8.0](https://dotnet.microsoft.com/en-us/download).
+* [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download).
 * [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48).
 * Optional windows updates and/or manual install serial port drivers for your nanoframework compatible device(s).
 
-> [!Important]
-> It is reccomended that you move the `agent` folder to the root of the filesystem.
-
-
 ## Agent installation
+Download the latest repo source.
+From your source download directory, open the terminal as administrator, then:
+
+```powershell
+.\capabilities.ps1 -IgnoreAllEnv $True -SkipCapabilities $True
+```
 
 Follow the instruction that will looks like this:
 
@@ -20,13 +22,9 @@ Follow the instruction that will looks like this:
 
 By default, the agent will advertise almost all your environement variables including the name of the user, some key directories, and many many other elements. You can get rid of this by setting up the VSO_AGENT_IGNORE environement variable. Run the script with this specific setup to create this environement variable **before** you setup the configuration.
 
-```powershell
-.\capabilities.ps1 -IgnoreAllEnv $True -SkipCapabilities $true
-```
-
 Then, you can run the `.\config.cmd` where you will be prompted for:
 
-* the serveur URL: `https://dev.azure.com/nanoframework`
+* the server URL: `https://dev.azure.com/nanoframework`
 * the authentication, use the default PAT
 * paste your Personal access token when asked
 * the agent pool is: `TestStream`
@@ -39,7 +37,7 @@ Copy the [capabilities.ps1](./agent/capabilities.ps1) file to the C`:\agent` fol
 
 ## Setup agent capabilities
 
-Once you've been running the previous configuration, you'll need to create a `configuration.json` file in the `C:\agent` directory.
+Once you've been running the previous configuration, you'll need to create a `configuration.json` file in the `C:\agent` directory (or where you have placed the directory).
 
 The configuration should like the devices you have and the serial ports associated. As an example:
 
