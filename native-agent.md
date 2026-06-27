@@ -8,7 +8,11 @@ Before attempting a first install, you will first need to install these dependen
 * [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48).
 * Optional windows updates and/or manual install serial port drivers for your nanoframework compatible device(s).
 
-It is also reccomended that you move the `agent` folder to the root of the filesystem.
+> [!Important]
+> It is reccomended that you move the `agent` folder to the root of the filesystem.
+
+
+## Agent installation
 
 Follow the instruction that will looks like this:
 
@@ -67,7 +71,7 @@ The token will only be used during the setup of the capability and will be delet
 
 ## Run the agent
 
-Depending on what you have chosen during the installation, it will either run as a service, either as on demand. You can as well create a task.
+Depending on what you have chosen during the installation, it will either run as a service, or on demand. You could also create an OS task for your specific needs.
 
 > [!Important]
-> When the Person Access Token expires, you'll need to rerun the configuration with your new one.
+> When the Person Access Token expires, you'll need to rerun the configuration with your new one, there will not be a warning that it has expired.
