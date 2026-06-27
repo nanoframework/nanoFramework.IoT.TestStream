@@ -32,6 +32,7 @@ For WSL agent installation, see [this document](./wsl-agent.md).
 
 ## Maintainer documentation
 
+If wanting to add your environment as part of the official hardware tests, An azure devops `PAT` will need to be provided from a maintainer.
 Please [check this page](./maintainer.md) for maintainer documentation and details.
 
 ## Missing elements
