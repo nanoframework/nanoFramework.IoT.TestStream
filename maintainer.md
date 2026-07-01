@@ -1,41 +1,41 @@
 # Maintainer documentation for TestStream.Runner and pipeline setup
 
-This documentation is intended for maintainer to manage releases, setup pipelines and create PAT token for the users.
+This documentation is intended for maintainers to manage releases, set up pipelines, and create PAT tokens for users.
 
 ## Creating a new release
 
-On PR on TestStream.Runner, only a build is done. This does allow flexibility to only create a release when the changes are not on documentation, on the nanoFramework PoC application or to have multiple PR merged before.
+On a PR on TestStream.Runner, only a build is done. This allows flexibility to create a release only when changes are not in documentation or in the nanoFramework PoC application, or to have multiple PRs merged before.
 
-To create a release, go to [Actions](https://github.com/nanoframework/nanoFramework.IoT.TestStream/actions/workflows/build-and-publish.yml) and run the `Build, Version, and Publish TestStream.Runner` action. This will build the application a a single file, package the needed configuration files and setup scripts, create a changelog and set a version.
+To create a release, go to [Actions](https://github.com/nanoframework/nanoFramework.IoT.TestStream/actions/workflows/build-and-publish.yml) and run the `Build, Version, and Publish TestStream.Runner` action. This will build the application as a single file, package the needed configuration files and setup scripts, create a changelog, and set a version.
 
 ## Creating a PAT token for contributors
 
-To avoid having to add every contributor who are willing to give some of their compute power to run hardware tests, an automatic mechanism with an Azure function will be built. In the mean time, PAT token can be created manually for a period that will be agreed with the contributor.
+To avoid having to add every contributor who is willing to give some of their compute power to run hardware tests, an automatic mechanism with an Azure function will be built. In the meantime, PAT tokens can be created manually for a period that will be agreed with the contributor.
 
 Manual steps:
 
-* Go to <https://dev.azure.com/nanoframework/> then connect with the account you want to create the PAT token
-* Click on the `user settings` to right
+* Go to <https://dev.azure.com/nanoframework/>, then connect with the account you want to use to create the PAT token.
+* Click on `User settings` on the right.
 
 ![use settings](./docs/pat-menu.png)
 
-* Select `Personal access tokens`
-* Click the top right button `New token`
-* Click on the bottom `Show all scopes`
-* Select `Read & manage` in `Agent Pools`
+* Select `Personal access tokens`.
+* Click the top-right button `New token`.
+* Click `Show all scopes` at the bottom.
+* Select `Read & manage` in `Agent Pools`.
 
 ![pat selection](./docs/pat-selection.png)
 
-* Give then name of the contributor to the token
-* Select a proper duration
-* Click `Create`
+* Give the contributor's name to the token.
+* Select a proper duration.
+* Click `Create`.
 
 > [!Important]
-> Make sure on the next screen, you copy the PAT token. Please communicate it in a secure way to the contributor with the expiration date.
+> Make sure on the next screen you copy the PAT token. Please communicate it securely to the contributor, along with the expiration date.
 
-## MAster PAT token for pipeline
+## Master PAT token for pipeline
 
-A master PAT token needs to be creacted and rotated as per policy. It should be added to the overall organization and named `AZURE_DEVOPS_PAT`. the scope should include:
+A master PAT token needs to be created and rotated as per policy. It should be added to the overall organization and named `AZURE_DEVOPS_PAT`. The scope should include:
 
 * Agent Pools: Read
 * Builds: Read & Execute
@@ -43,13 +43,13 @@ A master PAT token needs to be creacted and rotated as per policy. It should be 
 
 ## Setting up the TestStream pipeline in ADO
 
-You need to add the specific pool `TestStream` to any ADO project where you want to run the hardware tests.
+You need to add the specific pool `TestStream` to any ADO project where you want to run hardware tests.
 
 * Select the ADO project
 * Go to `Project settings` on the bottom left
 * Select `Agent pools`
 * Click `Add pool` button on top right
-* Select `Existing`, in the drop down select `TestStream`, click `Grant access`
+* Select `Existing`, in the drop-down select `TestStream`, then click `Grant access`.
 
 ![pipeline setup](./docs/ado-add-teststream.png)
 
@@ -57,9 +57,9 @@ You need to add the specific pool `TestStream` to any ADO project where you want
 
 ## Adjusting an existing ADO yml file to add hardware support
 
-Adjusting an existing ADO yml file to add the hardware tests is about transforming the existing pipeline into a multi stage pipeline and adding the test template. An example is in the [multi-stage.yaml](./multi-stage.yaml) file.
+Adjusting an existing ADO yml file to add hardware tests is about transforming the existing pipeline into a multi-stage pipeline and adding the test template. An example is in the [multi-stage.yaml](./multi-stage.yaml) file.
 
-Remove the trigger part and replace with, remove the cancel part as well:
+Remove the trigger part and replace it with the following, and remove the cancel part as well:
 
 ```yaml
 # The Pipeline is going to be called by the GitHub action.
@@ -68,7 +68,7 @@ trigger: none
 pr: none
 ```
 
-Add the folling block after the `resources` entry:
+Add the following block after the `resources` entry:
 
 ```yml
 parameters:
@@ -82,9 +82,9 @@ parameters:
 > [!Important]
 > List all the firmware that are present in existing self hosted agents.
 
-This will be adjusted with a git action later to browse existing agents and gather this information. So far, it's a manual gathering.
+This will be adjusted with a GitHub Action later to browse existing agents and gather this information. So far, it's a manual process.
 
-Transform the pool into a multi stage, don't forget to indent everything else in the yaml file:
+Transform the pool into a multi-stage pipeline, and don't forget to indent everything else in the yaml file:
 
 ```yml
 stages:
@@ -108,9 +108,9 @@ Add a task at the end of your pipeline:
         artifactName: 'Artifacts'
 ```
 
-This will publish all the built elements into the Azure artifact so that, the hardware tests will grab it to run them.
+This will publish all the built elements into the Azure artifact so that the hardware tests can grab them to run.
 
-Add then this block at the very end, it will create multi stages that depends on the build and will run the hardware tests:
+Then add this block at the very end. It will create multiple stages that depend on the build and run the hardware tests:
 
 ```yml
 - ${{ each appComponents in parameters.appComponents }}:   
@@ -122,11 +122,11 @@ Add then this block at the very end, it will create multi stages that depends on
 ```
 
 > [!Important]
-> You have to list all the tests you want to run with each individual tests you want to run. Each line is a specific dll, separate the runsetting with the built dll with a coma.
+> You have to list all the tests you want to run, with each individual test you want to run. Each line is a specific dll; separate the runsettings from the built dll with a comma.
 
 ## Creating a new ADO pipeline to trigger the pipeline
 
-You will have to add a new ADO pipeline. You can name the file `azure-bootstrap.yml`. And place the following content:
+You will have to add a new ADO pipeline. You can name the file `azure-bootstrap.yml`, and place the following content:
 
 ```yaml
 # Copyright (c) .NET Foundation and Contributors
