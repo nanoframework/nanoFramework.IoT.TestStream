@@ -1,20 +1,20 @@
 # Native agent installation
 
-## Pre requirements
+## Prerequisites
 
-Before attempting a first install, you will first need to install these dependencies on your PC:
+Before attempting a first install, you will need to install these dependencies on your PC:
 
 * [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download).
 * [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48).
-* Optional windows updates and/or manual install serial port drivers for your nanoframework compatible device(s).
+* Optional Windows updates and/or manual installation of serial port drivers for your nanoFramework-compatible device(s).
 
 ## Agent installation
-Download the latest repo source.
+Download the latest repository source.
 
-Download the latest agent installation runner
+Download the latest agent installation runner.
 ![instructions](./docs/native-setup.png)
 
-By default, the agent will advertise almost all your environment variables including the name of the user, some key directories, and many many other elements. You can get rid of this by setting up the VSO_AGENT_IGNORE environment variable. Run the script with this specific setup to create this environment variable **before** you setup the configuration.
+By default, the agent will advertise almost all your environment variables, including the username, some key directories, and many other elements. You can get rid of this by setting up the VSO_AGENT_IGNORE environment variable. Run the script with this specific setup to create this environment variable **before** you set up the configuration.
 
 From your source download directory, open the terminal as administrator, then:
 
@@ -22,26 +22,26 @@ From your source download directory, open the terminal as administrator, then:
 .\capabilities.ps1 -IgnoreAllEnv $True -SkipCapabilities $True
 ```
 
-Follow the instruction that will looks like this:
+Follow the instructions, which will look like this:
 
-Then, you can run the `.\config.cmd` where you will be prompted for:
+Then, you can run `./config.cmd`, where you will be prompted for:
 
 * the server URL: `https://dev.azure.com/nanoframework`
 * the authentication, use the default PAT
-* paste your Personal access token when asked
+* paste your Personal Access Token when asked
 * the agent pool is: `TestStream`
 * use the default `_work` directory
-* select if you want or not install the agent as a service or not
+* select whether you want to install the agent as a service
 
-Copy the [capabilities.ps1](./agent/capabilities.ps1) file to the C`:\agent` folder.
+Copy the [capabilities.ps1](./agent/capabilities.ps1) file to the `C:\agent` folder.
 
 
 
 ## Setup agent capabilities
 
-Once you've been running the previous configuration, you'll need to create a `configuration.json` file in the `C:\agent` directory (or where you have placed the directory).
+Once you've run the previous configuration, you'll need to create a `configuration.json` file in the `C:\agent` directory (or wherever you placed the directory).
 
-The configuration should like the devices you have and the serial ports associated. As an example:
+The configuration should reflect the devices you have and the associated serial ports. As an example:
 
 ```json
 {
@@ -51,12 +51,12 @@ The configuration should like the devices you have and the serial ports associat
 }
 ```
 
-You can add as many nanoFramework compatible hardware devices as you want. It is important to set the used serial port properly for each device added. 
+You can add as many nanoFramework-compatible hardware devices as you want. It is important to set the serial port used properly for each device added.
 
 > [!Important]
-> You can also share the same hardware device with different nf-interpreter versions as although they'll share the same serial port, at a single point of time, only 1 remote pipeline is running, so there won't be any conflict with the serial ports used.
+> You can also share the same hardware device with different nf-interpreter versions. Although they'll share the same serial port, at a single point in time only 1 remote pipeline is running, so there won't be any conflict with the serial ports used.
 
-Then in powershell, run the following commands:
+Then in PowerShell, run the following commands:
 
 ```powershell
 cd C:\agent
@@ -64,7 +64,7 @@ $env:AZP_TOKEN="yourPersonalAccessToken"
 .\capabilities.ps1
 ```
 
-The token will only be used during the setup of the capability and will be deleted after from the environment and from a temporary file that will be created.
+The token will only be used during capability setup, and will then be deleted from the environment and from a temporary file that is created.
 
 > [!Important]
 > You will have to run this script every time you change the capabilities, meaning, adding or removing hardware.
