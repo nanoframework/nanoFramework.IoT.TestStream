@@ -34,6 +34,19 @@ namespace UnitTestStream
         }
 
         [TestMethod]
+        public void TestMultiply()
+        {
+            // Arrange
+            TestStream testStream = new TestStream();
+
+            // Act
+            int result = testStream.Multiply(2, 3);
+
+            //Assert
+            Assert.AreEqual(6, result);
+        }
+
+        [TestMethod]
         [DataRow(4)]
         public void TestOpenPinBlinkAndClose(int pinNumber)
         {
