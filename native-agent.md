@@ -8,21 +8,24 @@ Before attempting a first install, you will need to install these dependencies o
 * [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48).
 * Optional Windows updates and/or manual installation of serial port drivers for your nanoFramework-compatible device(s).
 
+Also make sure that a maintainer has granted you a Personal Access Token.
+
 ## Agent installation
-Download the latest repository source.
 
-Download the [latest agent installation runner](https://github.com/microsoft/azure-pipelines-agent), and run it.
-![instructions](./docs/native-setup.png)
+Download the [latest agent installation runner](https://github.com/microsoft/azure-pipelines-agent/releases) and extract it to `C:\agents\`.
 
-By default, the agent will advertise almost all your environment variables, including the username, some key directories, and many other elements. You can get rid of this by setting up the VSO_AGENT_IGNORE environment variable. Run the script with this specific setup to create this environment variable **before** you set up the configuration.
+> [!Important]
+> By default, the agent will advertise almost all your environment variables, including the username, some key directories, and many other elements. You can get rid of this by setting up the VSO_AGENT_IGNORE environment variable. Run the script with this specific setup to create this environment variable **before** you set up the configuration.
 
+Download this latest repository source.
 From your source download directory, open the terminal as administrator, then:
 
+(you may need to change the execeution properties in windowsdeveloper options and/or `Set-ExecutionPolicy Bypass -Scope Process`, ) until we have signed the file
+
+Copy the [capabilities.ps1](./agent/capabilities.ps1) file to the `C:\agents` folder, and then run:
 ```powershell
 .\capabilities.ps1 -IgnoreAllEnv $True -SkipCapabilities $True
 ```
-
-Follow the instructions, which will look like this:
 
 Then, you can run `./config.cmd`, where you will be prompted for:
 
@@ -30,16 +33,17 @@ Then, you can run `./config.cmd`, where you will be prompted for:
 * the authentication, use the default PAT
 * paste your Personal Access Token when asked
 * the agent pool is: `TestStream`
+* the agent name is: `<your github id>-testrunner`
 * use the default `_work` directory
 * select whether you want to install the agent as a service
 
-Copy the [capabilities.ps1](./agent/capabilities.ps1) file to the `C:\agent` folder.
+
 
 
 
 ## Setup agent capabilities
 
-Once you've run the previous configuration, you'll need to create a `configuration.json` file in the `C:\agent` directory (or wherever you placed the directory).
+Once you've run the previous configuration, you'll need to create a `configuration.json` file in the `C:\agents` directory (or wherever you placed the directory).
 
 The configuration should reflect the devices you have and the associated serial ports. As an example:
 
@@ -59,7 +63,7 @@ You can add as many nanoFramework-compatible hardware devices as you want. It is
 Then in PowerShell, run the following commands:
 
 ```powershell
-cd C:\agent
+cd C:\agents
 $env:AZP_TOKEN="yourPersonalAccessToken"
 .\capabilities.ps1
 ```
