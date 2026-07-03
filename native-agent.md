@@ -11,7 +11,7 @@ Before attempting a first install, you will need to install these dependencies o
 ## Agent installation
 Download the latest repository source.
 
-Download the latest agent installation runner.
+Download the [latest agent installation runner](https://github.com/microsoft/azure-pipelines-agent), and run it.
 ![instructions](./docs/native-setup.png)
 
 By default, the agent will advertise almost all your environment variables, including the username, some key directories, and many other elements. You can get rid of this by setting up the VSO_AGENT_IGNORE environment variable. Run the script with this specific setup to create this environment variable **before** you set up the configuration.
